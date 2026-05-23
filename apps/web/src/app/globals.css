@@ -1,0 +1,9 @@
+@import "@interview-battlefield/ui/styles.css";
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}

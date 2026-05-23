@@ -1,0 +1,18 @@
+{
+  "name": "@interview-battlefield/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tailwind": "./src/tailwind.ts",
+    "./tokens": "./src/tokens.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.18",
+    "typescript": "^5.9.3"
+  }
+}

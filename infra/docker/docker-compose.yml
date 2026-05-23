@@ -1,0 +1,108 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: battlefield
+      POSTGRES_PASSWORD: battlefield
+      POSTGRES_DB: interview_battlefield
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U battlefield -d interview_battlefield"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  auth-service:
+    build:
+      context: ../..
+      dockerfile: infra/docker/auth-service.Dockerfile
+    env_file:
+      - ../../.env
+    environment:
+      PORT: 4001
+      DATABASE_URL: postgresql://battlefield:battlefield@postgres:5432/interview_battlefield?schema=public
+    ports:
+      - "4001:4001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  interview-service:
+    build:
+      context: ../..
+      dockerfile: infra/docker/interview-service.Dockerfile
+    env_file:
+      - ../../.env
+    environment:
+      PORT: 4002
+      WEB_URL: http://localhost:3000
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "4002:4002"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - redis
+
+  ai-service:
+    build:
+      context: ../..
+      dockerfile: infra/docker/ai-service.Dockerfile
+    env_file:
+      - ../../.env
+    environment:
+      PORT: 4003
+      WEB_URL: http://localhost:3000
+    ports:
+      - "4003:4003"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ../..
+      dockerfile: infra/docker/web.Dockerfile
+      args:
+        NEXT_PUBLIC_AUTH_SERVICE_URL: http://localhost:4001
+        NEXT_PUBLIC_INTERVIEW_SERVICE_URL: http://localhost:4002
+        NEXT_PUBLIC_AI_SERVICE_URL: http://localhost:4003
+    environment:
+      NEXT_PUBLIC_AUTH_SERVICE_URL: http://localhost:4001
+      NEXT_PUBLIC_INTERVIEW_SERVICE_URL: http://localhost:4002
+      NEXT_PUBLIC_AI_SERVICE_URL: http://localhost:4003
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - auth-service
+      - interview-service
+      - ai-service
+
+volumes:
+  postgres-data:
+  redis-data:

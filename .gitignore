@@ -1,0 +1,15 @@
+node_modules
+.next
+.turbo
+dist
+build
+coverage
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+.expo
+.expo-shared
+*.log
+postgres-data
+redis-data

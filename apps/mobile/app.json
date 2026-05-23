@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "PrepNexo",
+    "slug": "prepnexo",
+    "scheme": "prepnexo",
+    "icon": "./assets/images/favicon.png",
+    "userInterfaceStyle": "automatic",
+    "orientation": "portrait",
+    "newArchEnabled": true
+  }
+}
