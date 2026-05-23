@@ -1,10 +1,12 @@
+const releaseDir = process.env.PREPNEXO_RELEASE_DIR || process.cwd();
+
 module.exports = {
   apps: [
     {
       name: "prepnexo-web",
-      cwd: process.env.PREPNEXO_RELEASE_DIR || process.cwd(),
-      script: "node_modules/next/dist/bin/next",
-      args: "start apps/web -p 3000",
+      cwd: `${releaseDir}/apps/web`,
+      script: "node_modules/.bin/next",
+      args: "start -p 3000",
       env: {
         NODE_ENV: "production",
         PORT: "3000"
@@ -12,8 +14,8 @@ module.exports = {
     },
     {
       name: "prepnexo-auth",
-      cwd: process.env.PREPNEXO_RELEASE_DIR || process.cwd(),
-      script: "services/auth-service/dist/server.js",
+      cwd: releaseDir,
+      script: "services/auth-service/dist/services/auth-service/src/server.js",
       env: {
         NODE_ENV: "production",
         PORT: "4001"
@@ -21,8 +23,8 @@ module.exports = {
     },
     {
       name: "prepnexo-interview",
-      cwd: process.env.PREPNEXO_RELEASE_DIR || process.cwd(),
-      script: "services/interview-service/dist/server.js",
+      cwd: releaseDir,
+      script: "services/interview-service/dist/services/interview-service/src/server.js",
       env: {
         NODE_ENV: "production",
         PORT: "4002"
@@ -30,7 +32,7 @@ module.exports = {
     },
     {
       name: "prepnexo-ai",
-      cwd: process.env.PREPNEXO_RELEASE_DIR || process.cwd(),
+      cwd: releaseDir,
       script: "services/ai-service/dist/server.js",
       env: {
         NODE_ENV: "production",

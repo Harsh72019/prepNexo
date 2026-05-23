@@ -50,7 +50,10 @@ For a single AWS VM deployment with PM2:
 ```bash
 pnpm install --frozen-lockfile
 pnpm db:generate
-pnpm --filter @interview-battlefield/auth-service prisma migrate deploy
+set -a
+. ./.env
+set +a
+pnpm --filter @interview-battlefield/auth-service prisma:deploy
 pnpm build
 pm2 start infra/pm2/ecosystem.config.cjs
 pm2 save
