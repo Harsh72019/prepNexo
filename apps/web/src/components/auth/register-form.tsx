@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRegister } from "@/hooks/use-auth";
+import { env } from "@/lib/env";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -36,6 +37,9 @@ export function RegisterForm() {
         <Input id="password" type="password" autoComplete="new-password" {...form.register("password")} />
       </Field>
       <Button type="submit" loading={register.isPending}>Create account</Button>
+      <Button asChild variant="outline" type="button">
+        <a href={`${env.authServiceUrl}/api/auth/google`}>Continue with Google</a>
+      </Button>
       <p className="text-center text-sm text-muted-foreground">
         Already training? <Link className="text-primary hover:underline" href="/login">Log in</Link>
       </p>

@@ -42,6 +42,14 @@ const envSchema = z.object({
       message: "EMAIL_FROM must include a valid sender email when RESEND_API_KEY is set"
     });
   }
+
+  if (Boolean(env.GOOGLE_CLIENT_ID) !== Boolean(env.GOOGLE_CLIENT_SECRET)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["GOOGLE_CLIENT_ID"],
+      message: "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together"
+    });
+  }
 });
 
 export const env = envSchema.parse(process.env);

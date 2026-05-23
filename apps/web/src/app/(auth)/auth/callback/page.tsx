@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Skeleton } from "@interview-battlefield/ui/components/skeleton";
+import { toast } from "sonner";
 import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -20,9 +21,14 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      const user = await authApi.me(accessToken);
-      setSession({ user: user.data, accessToken, refreshToken });
-      router.replace("/dashboard");
+      try {
+        const user = await authApi.me(accessToken);
+        setSession({ user: user.data, accessToken, refreshToken });
+        router.replace("/dashboard");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Could not complete Google sign in");
+        router.replace("/login");
+      }
     }
 
     void hydrate();
