@@ -494,8 +494,8 @@ export function SystemDesignCanvas({
 
   return (
     <div className="grid gap-4">
-      <section className="arena-surface rounded-lg border shadow-[0_18px_60px_rgb(0_0_0/0.22)]">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-background/45 px-4 py-3 backdrop-blur">
+      <section className="arena-surface relative overflow-visible rounded-lg border shadow-[0_18px_60px_rgb(0_0_0/0.22)]">
+        <div className="relative z-50 flex flex-wrap items-center justify-between gap-3 border-b bg-background/45 px-4 py-3 backdrop-blur">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase text-primary">
               System design simulator
@@ -519,7 +519,7 @@ export function SystemDesignCanvas({
               />
             </Button>
             {scenarioPickerOpen ? (
-              <div className="absolute right-0 top-12 z-50 grid max-h-[420px] w-[min(92vw,420px)] gap-2 overflow-auto rounded-lg border bg-background p-2 shadow-2xl">
+              <div className="absolute right-0 top-12 z-[100] grid max-h-[420px] w-[min(92vw,420px)] gap-2 overflow-auto rounded-lg border bg-background p-2 shadow-2xl">
                 {(catalog.data?.designScenarios ?? []).map((scenario) => (
                   <button
                     key={scenario.id}
@@ -545,7 +545,7 @@ export function SystemDesignCanvas({
             ) : null}
           </div>
         </div>
-        <div className="grid min-h-[720px] gap-0 2xl:grid-cols-[260px_minmax(560px,1fr)_300px]">
+        <div className="relative z-0 grid min-h-[720px] gap-0 2xl:grid-cols-[260px_minmax(560px,1fr)_300px]">
           <aside className="border-b bg-background/35 p-3 2xl:border-b-0 2xl:border-r">
             <div className="grid gap-3">
               <div>
