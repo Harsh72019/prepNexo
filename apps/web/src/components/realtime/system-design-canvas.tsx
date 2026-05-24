@@ -2,10 +2,9 @@
 
 import type { RealtimeUser, SystemDesignBlock, SystemDesignCanvasState } from "@interview-battlefield/types";
 import { Button } from "@interview-battlefield/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@interview-battlefield/ui/components/card";
 import { Input } from "@interview-battlefield/ui/components/input";
 import { cn } from "@interview-battlefield/ui/lib/utils";
-import { Bot, Boxes, Cable, Link2, Network, Play, Plus, RotateCcw, ShieldCheck, Siren, Sparkles, Trash2, Zap } from "lucide-react";
+import { Bot, Boxes, Cable, ChevronDown, Database, HardDrive, Link2, Network, Play, Plus, RotateCcw, Send, Server, ShieldCheck, Siren, Sparkles, Trash2, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MarkdownContent } from "@/components/ai/markdown-content";
 import { usePressurePrompt } from "@/hooks/use-adaptive";
@@ -41,6 +40,16 @@ const blockPalette: Array<{ type: SystemDesignBlock["type"]; label: string }> = 
   { type: "storage", label: "CDN" }
 ];
 
+const blockIcons: Record<SystemDesignBlock["type"], typeof Server> = {
+  client: Send,
+  gateway: Network,
+  service: Server,
+  database: Database,
+  cache: Zap,
+  queue: Cable,
+  storage: HardDrive
+};
+
 const emptyCanvas = (roomId: string): SystemDesignCanvasState => ({
   roomId,
   blocks: [],
@@ -60,6 +69,7 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
   const [feedback, setFeedback] = useState<string | null>(null);
   const [feedbackStreaming, setFeedbackStreaming] = useState(false);
   const [selectedScenarioId, setSelectedScenarioId] = useState("collab-interview-platform");
+  const [scenarioPickerOpen, setScenarioPickerOpen] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [connectMode, setConnectMode] = useState(false);
   const [customLabel, setCustomLabel] = useState("New service");
@@ -69,6 +79,7 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragStateRef = useRef({ moved: false });
   const selectedScenario = catalog.data?.designScenarios.find((scenario) => scenario.id === selectedScenarioId) ?? catalog.data?.designScenarios[0];
+  const selectedBlock = canvas?.blocks.find((block) => block.id === selectedBlockId);
 
   useEffect(() => {
     if (!connected) return;
@@ -179,8 +190,8 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
       id: `${type}-${Date.now()}`,
       type,
       label,
-      x: 72 + ((index * 180) % 620),
-      y: 80 + (Math.floor(index / 4) * 128)
+      x: 92 + ((index * 190) % 760),
+      y: 92 + (Math.floor(index / 5) * 126)
     };
     setCanvas((current) => current ? { ...current, blocks: [...current.blocks, block] } : { roomId, blocks: [block], connections: [], updatedAt: new Date().toISOString() });
     socket.emit("system-design:block-update", { roomId, block, user });
@@ -276,6 +287,22 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
     });
   }
 
+  function connectionPath(from: SystemDesignBlock, to: SystemDesignBlock) {
+    const blockWidth = 144;
+    const blockHeight = 76;
+    const start = {
+      x: from.x + (to.x >= from.x ? blockWidth : 0),
+      y: from.y + blockHeight / 2
+    };
+    const end = {
+      x: to.x + (to.x >= from.x ? 0 : blockWidth),
+      y: to.y + blockHeight / 2
+    };
+    const horizontalGap = Math.abs(end.x - start.x);
+    const bendX = horizontalGap > 120 ? start.x + (end.x - start.x) / 2 : start.x + (to.x >= from.x ? 72 : -72);
+    return `M ${start.x} ${start.y} C ${bendX} ${start.y}, ${bendX} ${end.y}, ${end.x} ${end.y}`;
+  }
+
   if (screen === "home") {
     return (
       <div className="grid gap-6">
@@ -319,145 +346,105 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
   }
 
   return (
-    <div className="grid gap-6">
-      <section className="arena-surface rounded-lg border p-5 shadow-[0_18px_60px_rgb(0_0_0/0.22)]">
-        <p className="text-sm font-medium text-primary">Collaborative architecture</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-normal">System design simulator</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Select a scenario, add infrastructure blocks, connect components, and save the design attempt into analytics.
-        </p>
-      </section>
-      <section className="grid gap-4 xl:grid-cols-[320px_1fr]">
-        <div className="grid gap-4 content-start">
-          <Card>
-            <CardHeader>
-              <CardTitle>Scenario</CardTitle>
-              <CardDescription>Choose the system you want to pressure-test.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-2">
-              {(catalog.data?.designScenarios ?? []).map((scenario) => (
-                <button
-                  key={scenario.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedScenarioId(scenario.id);
-                    setStartedAt(Date.now());
-                  }}
-                  className={cn("rounded-md border p-3 text-left text-sm hover:bg-muted", scenario.id === selectedScenarioId && "border-primary bg-primary/10")}
-                >
-                  <span className="block font-medium">{scenario.title}</span>
-                  <span className="text-xs text-muted-foreground">{scenario.difficulty}</span>
-                </button>
-              ))}
-              {selectedScenario ? <p className="mt-2 text-sm text-muted-foreground">{selectedScenario.prompt}</p> : null}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Block palette</CardTitle>
-              <CardDescription>Add architecture components to the workspace.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              <div className="grid grid-cols-2 gap-2">
-                {blockPalette.map((item) => (
-                  <Button key={`${item.type}-${item.label}`} variant="outline" size="sm" onClick={() => addBlock(item.type, item.label)}>
-                    <Plus className="size-4" />
-                    {item.label}
-                  </Button>
+    <div className="grid gap-4">
+      <section className="arena-surface rounded-lg border shadow-[0_18px_60px_rgb(0_0_0/0.22)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-background/45 px-4 py-3 backdrop-blur">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase text-primary">System design simulator</p>
+            <h2 className="truncate text-xl font-semibold tracking-normal">{selectedScenario?.title ?? "Collaborative architecture"}</h2>
+          </div>
+          <div className="relative">
+            <Button variant="outline" onClick={() => setScenarioPickerOpen((current) => !current)}>
+              <Network className="size-4" />
+              Scenario
+              <ChevronDown className={cn("size-4 transition-transform", scenarioPickerOpen && "rotate-180")} />
+            </Button>
+            {scenarioPickerOpen ? (
+              <div className="absolute right-0 top-12 z-50 grid max-h-[420px] w-[min(92vw,420px)] gap-2 overflow-auto rounded-lg border bg-background p-2 shadow-2xl">
+                {(catalog.data?.designScenarios ?? []).map((scenario) => (
+                  <button
+                    key={scenario.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedScenarioId(scenario.id);
+                      setStartedAt(Date.now());
+                      setScenarioPickerOpen(false);
+                    }}
+                    className={cn("rounded-md border p-3 text-left text-sm transition hover:bg-muted", scenario.id === selectedScenarioId && "border-primary bg-primary/10")}
+                  >
+                    <span className="block font-medium">{scenario.title}</span>
+                    <span className="text-xs text-muted-foreground">{scenario.difficulty}</span>
+                  </button>
                 ))}
               </div>
-              <div className="grid gap-2 rounded-md border p-3">
-                <Input value={customLabel} onChange={(event) => setCustomLabel(event.target.value)} />
-                <div className="grid grid-cols-[1fr_auto] gap-2">
-                  <select
-                    value={customType}
-                    onChange={(event) => setCustomType(event.target.value as SystemDesignBlock["type"])}
-                    className="rounded-md border bg-background px-3 py-2 text-sm"
-                  >
-                    {(["client", "gateway", "service", "database", "cache", "queue", "storage"] as const).map((type) => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                  <Button size="sm" onClick={() => addBlock(customType, customLabel || customType)}>
-                    <Plus className="size-4" />
-                    Add
-                  </Button>
+            ) : null}
+          </div>
+        </div>
+        <div className="grid min-h-[720px] gap-0 xl:grid-cols-[260px_minmax(560px,1fr)_300px]">
+          <aside className="border-b bg-background/35 p-3 xl:border-b-0 xl:border-r">
+            <div className="grid gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase text-muted-foreground">Block palette</p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {blockPalette.map((item) => {
+                    const Icon = blockIcons[item.type];
+                    return (
+                      <button
+                        key={`${item.type}-${item.label}`}
+                        type="button"
+                        onClick={() => addBlock(item.type, item.label)}
+                        className="flex min-h-16 flex-col items-start justify-between rounded-md border bg-background/70 p-2 text-left text-xs font-medium transition hover:border-primary hover:bg-primary/10"
+                      >
+                        <Icon className="size-4 text-primary" />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="grid gap-2 rounded-md border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase text-muted-foreground">Custom block</p>
+                <Input value={customLabel} onChange={(event) => setCustomLabel(event.target.value)} />
+                <select
+                  value={customType}
+                  onChange={(event) => setCustomType(event.target.value as SystemDesignBlock["type"])}
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {(["client", "gateway", "service", "database", "cache", "queue", "storage"] as const).map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                <Button size="sm" onClick={() => addBlock(customType, customLabel || customType)}>
+                  <Plus className="size-4" />
+                  Add block
+                </Button>
+              </div>
+            </div>
+          </aside>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Tools</CardTitle>
-              <CardDescription>Build, connect, inject failures, and evaluate.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-2">
-              <Button variant={connectMode ? "default" : "outline"} onClick={() => setConnectMode((current) => !current)}>
-                <Link2 className="size-4" />
-                {connectMode ? selectedBlockId ? "Pick target block" : "Pick source block" : "Connect blocks"}
-              </Button>
-              <Button variant="outline" onClick={clearConnections}>Clear lines</Button>
-              <Button variant="outline" onClick={deleteSelectedBlock} disabled={!selectedBlockId}>
-                <Trash2 className="size-4" />
-                Delete selected
-              </Button>
-              <Button variant="outline" onClick={resetCanvas}>
-                <RotateCcw className="size-4" />
-                Empty canvas
-              </Button>
-              <Button variant="outline" onClick={injectIncident} loading={pressurePrompt.isPending}>
-                <Siren className="size-4" />
-                Inject failure
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <CardTitle className="flex items-center gap-2"><Network className="size-4 text-primary" /> Shared canvas</CardTitle>
-              <CardDescription>
-                {connectMode
-                  ? selectedBlockId ? "Click another block to draw a line." : "Click the source block."
-                  : connected ? "Drag blocks freely. Select one to rename or delete." : "Connecting to realtime service"}
-              </CardDescription>
+          <main className="min-w-0 p-3">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button size="sm" variant={connectMode ? "default" : "outline"} onClick={() => setConnectMode((current) => !current)}>
+                  <Link2 className="size-4" />
+                  {connectMode ? selectedBlockId ? "Pick target" : "Pick source" : "Connect"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={clearConnections}>Clear lines</Button>
+                <Button size="sm" variant="outline" onClick={resetCanvas}>
+                  <RotateCcw className="size-4" />
+                  Reset
+                </Button>
+              </div>
+              <div className="rounded-md border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
+                {canvas?.blocks.length ?? 0} blocks · {canvas?.connections.length ?? 0} lines · {connected ? "Live" : "Offline"}
+              </div>
             </div>
-            <Button variant="outline" onClick={requestCritique} loading={feedbackStreaming}>
-              <Bot className="size-4" />
-              AI critique
-            </Button>
-            <Button onClick={saveDesignAttempt} loading={submitAttempt.isPending}>Save attempt</Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-3 grid gap-3 md:grid-cols-[1fr_auto]">
-            <Input
-              value={canvas?.blocks.find((block) => block.id === selectedBlockId)?.label ?? ""}
-              onChange={(event) => updateSelectedLabel(event.target.value)}
-              disabled={!selectedBlockId}
-              placeholder="Select a block to rename it"
-            />
-            <div className="rounded-md border px-3 py-2 text-sm text-muted-foreground">
-              {canvas?.blocks.length ?? 0} blocks · {canvas?.connections.length ?? 0} lines
-            </div>
-          </div>
-          {incidents.length > 0 ? (
-            <div className="mb-3 grid gap-2">
-              {incidents.map((incident) => (
-                <div key={incident} className="rounded-md border border-accent/40 bg-accent/10 p-3 text-sm text-accent">{incident}</div>
-              ))}
-            </div>
-          ) : null}
           <div
             ref={canvasRef}
             onClick={(event) => {
               if (event.target === event.currentTarget) setSelectedBlockId(null);
             }}
-            className="relative h-[640px] overflow-hidden rounded-lg border bg-[linear-gradient(hsl(var(--border))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border))_1px,transparent_1px)] bg-[size:32px_32px]"
+            className="relative h-[640px] overflow-hidden rounded-lg border bg-background bg-[linear-gradient(hsl(var(--border))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border))_1px,transparent_1px)] bg-[size:32px_32px] shadow-inner"
           >
             {connectMode ? (
               <div className="absolute left-4 top-4 z-20 rounded-lg border bg-background/85 px-3 py-2 text-sm font-medium shadow-sm backdrop-blur">
@@ -476,15 +463,14 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
                 const to = canvas?.blocks.find((block) => block.id === edge.to);
                 if (!from || !to) return null;
                 return (
-                  <line
+                  <path
                     key={`${edge.from}-${edge.to}`}
-                    x1={from.x + 72}
-                    y1={from.y + 36}
-                    x2={to.x + 72}
-                    y2={to.y + 36}
+                    d={connectionPath(from, to)}
+                    fill="none"
                     stroke="hsl(var(--primary))"
                     strokeWidth="3"
                     strokeLinecap="round"
+                    strokeLinejoin="round"
                     markerEnd="url(#system-design-arrow)"
                   />
                 );
@@ -536,22 +522,60 @@ export function SystemDesignCanvas({ roomId = "demo-system-design" }: { roomId?:
               </div>
             ) : null}
           </div>
-        </CardContent>
-      </Card>
+          </main>
+
+          <aside className="grid content-start gap-3 border-t bg-background/35 p-3 xl:border-l xl:border-t-0">
+            <div className="rounded-md border bg-background/60 p-3">
+              <p className="text-xs font-semibold uppercase text-muted-foreground">Selected block</p>
+              <Input
+                className="mt-2"
+                value={selectedBlock?.label ?? ""}
+                onChange={(event) => updateSelectedLabel(event.target.value)}
+                disabled={!selectedBlockId}
+                placeholder="Select a block"
+              />
+              <Button className="mt-2 w-full" variant="outline" size="sm" onClick={deleteSelectedBlock} disabled={!selectedBlockId}>
+                <Trash2 className="size-4" />
+                Delete selected
+              </Button>
+            </div>
+            <div className="grid gap-2 rounded-md border bg-background/60 p-3">
+              <p className="text-xs font-semibold uppercase text-muted-foreground">Actions</p>
+              <Button variant="outline" onClick={injectIncident} loading={pressurePrompt.isPending}>
+                <Siren className="size-4" />
+                Inject failure
+              </Button>
+              <Button variant="outline" onClick={requestCritique} loading={feedbackStreaming}>
+                <Bot className="size-4" />
+                AI critique
+              </Button>
+              <Button onClick={saveDesignAttempt} loading={submitAttempt.isPending}>Save attempt</Button>
+            </div>
+            <div className="rounded-md border bg-background/60 p-3">
+              <p className="text-xs font-semibold uppercase text-muted-foreground">Scenario brief</p>
+              <p className="mt-2 text-sm text-muted-foreground">{selectedScenario?.prompt ?? "Choose a scenario to start."}</p>
+            </div>
+            {incidents.length > 0 ? (
+              <div className="grid max-h-40 gap-2 overflow-auto rounded-md border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase text-muted-foreground">Failures</p>
+                {incidents.map((incident) => (
+                  <div key={incident} className="rounded-md border border-accent/40 bg-accent/10 p-2 text-xs text-accent">{incident}</div>
+                ))}
+              </div>
+            ) : null}
+            <div className="rounded-md border bg-background/60 p-3">
+              <p className="flex items-center gap-2 text-sm font-semibold"><Bot className="size-4 text-primary" /> Gemini critique</p>
+              <div className="mt-2 max-h-64 overflow-auto rounded-md border bg-background/70 p-3 text-sm">
+                {feedback !== null ? (
+                  <MarkdownContent text={feedback || "Thinking..."} />
+                ) : (
+                  <p className="text-muted-foreground">Request a critique after arranging the blocks.</p>
+                )}
+              </div>
+            </div>
+          </aside>
+        </div>
       </section>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Bot className="size-4 text-primary" /> Gemini critique</CardTitle>
-          <CardDescription>Architecture feedback generated from the current canvas state.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {feedback !== null ? (
-            <div className="rounded-md border bg-background/60 p-4"><MarkdownContent text={feedback || "Thinking..."} /></div>
-          ) : (
-            <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">Request a critique after arranging the blocks.</div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
