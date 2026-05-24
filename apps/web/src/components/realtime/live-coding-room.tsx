@@ -33,10 +33,30 @@ function formatTime(seconds: number) {
 }
 
 function adaptiveProblems(source: PracticeProblem[]) {
-  const easy = source.find((problem) => problem.difficulty === "EASY") ?? source[0];
-  const medium = source.find((problem) => problem.difficulty === "MEDIUM") ?? source[1] ?? easy;
-  const hard = source.find((problem) => problem.difficulty === "HARD") ?? source[source.length - 1] ?? medium;
-  return [easy, medium, hard].filter(Boolean) as PracticeProblem[];
+  const picked: PracticeProblem[] = [];
+  const pick = (difficulty: PracticeProblem["difficulty"]) => {
+    const candidates = source.filter((problem) => problem.difficulty === difficulty);
+    return candidates.find((problem) => isDiverse(problem, picked))
+      ?? candidates.find((problem) => !picked.some((item) => item.id === problem.id))
+      ?? source.find((problem) => isDiverse(problem, picked))
+      ?? source.find((problem) => !picked.some((item) => item.id === problem.id));
+  };
+
+  for (const difficulty of ["EASY", "MEDIUM", "HARD"] as const) {
+    const next = pick(difficulty);
+    if (next) picked.push(next);
+  }
+  return picked;
+}
+
+function problemFamily(problem: PracticeProblem) {
+  const slug = problem.slug ?? "";
+  const family = slug.match(/^prepnexo-dsa-(.+)-\d+$/)?.[1] ?? null;
+  return family ?? (problem.title.split(":")[0] ?? problem.title).trim().toLowerCase();
+}
+
+function isDiverse(problem: PracticeProblem, selected: PracticeProblem[]) {
+  return !selected.some((item) => item.topic === problem.topic || problemFamily(item) === problemFamily(problem));
 }
 
 function draftKey(problemId: string, language: CodeLanguage) {

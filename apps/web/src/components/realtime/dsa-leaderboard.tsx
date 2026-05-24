@@ -31,12 +31,31 @@ function todayKey() {
 }
 
 function arenaProblems(source: PracticeProblem[]) {
-  const easy = source.find((problem) => problem.difficulty === "EASY") ?? source[0];
-  const mediums = source.filter((problem) => problem.difficulty === "MEDIUM");
-  const medium = mediums[0] ?? source[1] ?? easy;
-  const mediumHard = mediums[1] ?? source.find((problem) => problem.topic !== medium?.topic && problem.difficulty !== "EASY") ?? medium;
-  const hard = source.find((problem) => problem.difficulty === "HARD") ?? source[source.length - 1] ?? mediumHard;
-  return [easy, medium, mediumHard, hard].filter(Boolean) as PracticeProblem[];
+  const picked: PracticeProblem[] = [];
+  const pick = (difficulty: PracticeProblem["difficulty"], allowHardFallback = false) => {
+    const candidates = source.filter((problem) => problem.difficulty === difficulty || (allowHardFallback && problem.difficulty === "HARD"));
+    return candidates.find((problem) => isDiverse(problem, picked))
+      ?? candidates.find((problem) => !picked.some((item) => item.id === problem.id))
+      ?? source.find((problem) => isDiverse(problem, picked))
+      ?? source.find((problem) => !picked.some((item) => item.id === problem.id));
+  };
+
+  const ladder: Array<[PracticeProblem["difficulty"], boolean]> = [["EASY", false], ["MEDIUM", false], ["MEDIUM", true], ["HARD", false]];
+  for (const [difficulty, allowHardFallback] of ladder) {
+    const next = pick(difficulty, allowHardFallback);
+    if (next) picked.push(next);
+  }
+  return picked;
+}
+
+function problemFamily(problem: PracticeProblem) {
+  const slug = problem.slug ?? "";
+  const family = slug.match(/^prepnexo-dsa-(.+)-\d+$/)?.[1] ?? null;
+  return family ?? (problem.title.split(":")[0] ?? problem.title).trim().toLowerCase();
+}
+
+function isDiverse(problem: PracticeProblem, selected: PracticeProblem[]) {
+  return !selected.some((item) => item.topic === problem.topic || problemFamily(item) === problemFamily(problem));
 }
 
 function draftKey(problemId: string, language: CodeLanguage) {
