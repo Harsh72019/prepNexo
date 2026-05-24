@@ -1,4 +1,4 @@
-import type { SubmitAttemptInput } from "@interview-battlefield/types";
+import type { CompanyTag, DesignScenario, PracticeProblem, SubmitAttemptInput } from "@interview-battlefield/types";
 import { AttemptKind, AttemptStatus, Prisma } from "@prisma/client";
 import { prisma } from "../config/prisma.js";
 import { AdaptiveService } from "./adaptive.service.js";
@@ -23,24 +23,62 @@ type QuestionInput = {
   status?: string;
 };
 
+type CatalogQuestion = Prisma.QuestionGetPayload<{
+  include: { progress: { take: 1 } };
+}>;
+
+type TopicSignal = {
+  topic: string;
+  proficiency: number;
+  targetScore: number;
+};
+
+type PersonalizationContext = {
+  weakTopics: Set<string>;
+  targetCompanies: Set<string>;
+  dueSkillKeys: Set<string>;
+  readinessScore: number;
+  topics: TopicSignal[];
+};
+
 export class PracticeService {
   private adaptiveService = new AdaptiveService();
 
   async catalog(userId: string) {
     await this.adaptiveService.ensureSkillGraph(userId);
-    const topics = await prisma.topicProgress.findMany({
-      where: { userId },
-      orderBy: [{ proficiency: "asc" }, { attempts: "desc" }]
-    });
+    const [topics, profile, skillNodes, questions] = await Promise.all([
+      prisma.topicProgress.findMany({
+        where: { userId },
+        orderBy: [{ proficiency: "asc" }, { attempts: "desc" }]
+      }),
+      prisma.userProfile.findUnique({ where: { userId } }),
+      prisma.skillNode.findMany({
+        where: { userId },
+        orderBy: [{ mastery: "asc" }, { nextReviewAt: "asc" }]
+      }),
+      prisma.question.findMany({
+        where: { status: "ACTIVE" },
+        include: { progress: { where: { userId }, take: 1 } },
+        orderBy: [{ createdAt: "desc" }, { updatedAt: "desc" }]
+      })
+    ]);
 
-    const questions = await prisma.question.findMany({
-      where: { status: "ACTIVE" },
-      include: { progress: { where: { userId }, take: 1 } },
-      orderBy: [{ updatedAt: "desc" }]
-    });
-    const mappedQuestions = this.adaptiveOrder(questions.map((question) => this.toPracticeProblem(question)), topics);
-    const codingQuestionBank = mappedQuestions.filter((question) => question.type !== "SYSTEM_DESIGN" && question.type !== "BEHAVIORAL");
-    const dsaQuestionBank = mappedQuestions.filter((question) => question.type === "DSA");
+    const context = this.buildPersonalizationContext(profile, topics, skillNodes);
+    const mappedQuestions = questions.map((question) => this.toPracticeProblem(question));
+    const codingQuestionBank = this.personalizePracticeProblems(
+      mappedQuestions.filter((question) => question.type !== "SYSTEM_DESIGN" && question.type !== "BEHAVIORAL"),
+      context,
+      80
+    );
+    const dsaQuestionBank = this.personalizePracticeProblems(
+      mappedQuestions.filter((question) => question.type === "DSA"),
+      context,
+      120
+    );
+    const systemDesignBank = this.personalizeSystemDesign(
+      questions.filter((question) => question.type === "SYSTEM_DESIGN"),
+      context
+    );
 
     return {
       topics: topics.map((topic) => ({
@@ -52,7 +90,7 @@ export class PracticeService {
       })),
       codingProblems: codingQuestionBank.length ? codingQuestionBank : codingProblems,
       dsaProblems: dsaQuestionBank.length ? dsaQuestionBank : dsaProblems,
-      designScenarios
+      designScenarios: systemDesignBank.length ? systemDesignBank : designScenarios
     };
   }
 
@@ -153,7 +191,7 @@ export class PracticeService {
     return attempt;
   }
 
-  private toPracticeProblem(question: Awaited<ReturnType<typeof prisma.question.findMany>>[number] & { progress?: Array<{ solvedCount: number; lastAttemptAt: Date | null; nextReviewAt: Date | null }> }) {
+  private toPracticeProblem(question: CatalogQuestion): PracticeProblem {
     const progress = question.progress?.[0];
     const dueForReview = progress?.nextReviewAt ? progress.nextReviewAt <= new Date() : false;
     return {
@@ -164,13 +202,13 @@ export class PracticeService {
       topic: question.topic,
       difficulty: question.difficulty as "EASY" | "MEDIUM" | "HARD",
       company: question.company,
-      companyTags: Array.isArray(question.companyTags) ? question.companyTags as Array<"STARTUP" | "BIG_TECH" | "PRODUCT_BASED" | "MNC" | "SERVICE_BASED"> : [],
+      companyTags: this.jsonArray<CompanyTag>(question.companyTags),
       prompt: question.description,
       acceptanceText: question.acceptanceText,
       starterCode: question.starterCode ?? "export function solve(nums: number[]) {\n  return nums.length;\n}",
-      testCases: Array.isArray(question.testCases) ? question.testCases as Array<{ input: number[]; expected: number }> : [],
-      examples: Array.isArray(question.examples) ? question.examples as unknown[] : [],
-      skillKeys: Array.isArray(question.skillKeys) ? question.skillKeys as string[] : skillKeysForTopic(question.topic),
+      testCases: this.jsonArray<{ input: number[]; expected: number }>(question.testCases),
+      examples: this.jsonArray<unknown>(question.examples),
+      skillKeys: this.jsonArray<string>(question.skillKeys).length ? this.jsonArray<string>(question.skillKeys) : skillKeysForTopic(question.topic),
       solvedCount: progress?.solvedCount ?? 0,
       lastSolvedAt: progress?.lastAttemptAt?.toISOString() ?? null,
       nextReviewAt: progress?.nextReviewAt?.toISOString() ?? null,
@@ -178,16 +216,127 @@ export class PracticeService {
     };
   }
 
-  private adaptiveOrder<T extends { topic: string; solvedCount?: number; nextReviewAt?: string | null }>(questions: T[], topics: Array<{ topic: string; proficiency: number; targetScore: number }>) {
-    const weakTopics = new Map(topics.map((topic) => [topic.topic.toLowerCase(), Math.max(topic.targetScore - topic.proficiency, 0)]));
+  private buildPersonalizationContext(
+    profile: Awaited<ReturnType<typeof prisma.userProfile.findUnique>>,
+    topics: TopicSignal[],
+    skillNodes: Array<{ key: string; mastery: number; nextReviewAt: Date | null }>
+  ): PersonalizationContext {
+    const profileWeakTopics = this.jsonArray<string>(profile?.weakestTopics).map((topic) => topic.toLowerCase());
+    const topicWeakness = topics
+      .filter((topic) => topic.proficiency < topic.targetScore || topic.proficiency < 70)
+      .sort((a, b) => (b.targetScore - b.proficiency) - (a.targetScore - a.proficiency))
+      .slice(0, 8)
+      .map((topic) => topic.topic.toLowerCase());
+    const targetCompanies = this.jsonArray<string>(profile?.targetCompanies).map((company) => company.toLowerCase());
+    const now = new Date();
+
+    return {
+      weakTopics: new Set([...profileWeakTopics, ...topicWeakness]),
+      targetCompanies: new Set(targetCompanies),
+      dueSkillKeys: new Set(
+        skillNodes
+          .filter((skill) => skill.mastery < 65 || (skill.nextReviewAt && skill.nextReviewAt <= now))
+          .slice(0, 12)
+          .map((skill) => skill.key)
+      ),
+      readinessScore: profile?.readinessScore ?? 42,
+      topics
+    };
+  }
+
+  private personalizePracticeProblems(questions: PracticeProblem[], context: PersonalizationContext, minimumUnsolvedBeforeRepeats: number) {
+    const unsolved = questions.filter((question) => !question.solvedCount);
+    const pool = unsolved.length >= minimumUnsolvedBeforeRepeats
+      ? unsolved
+      : [
+          ...unsolved,
+          ...questions.filter((question) => question.solvedCount && question.nextReviewAt && new Date(question.nextReviewAt) <= new Date()),
+          ...questions.filter((question) => question.solvedCount)
+        ];
+
+    return this.adaptiveOrder(pool, context)
+      .map((question) => ({
+        ...question,
+        recommendedReason: this.recommendationReason(question, context)
+      }));
+  }
+
+  private personalizeSystemDesign(questions: CatalogQuestion[], context: PersonalizationContext): DesignScenario[] {
+    const mapped = questions.map((question) => this.toDesignScenario(question));
+    const unsolved = mapped.filter((scenario) => {
+      const source = questions.find((question) => question.id === scenario.id);
+      return !source?.progress?.[0]?.solvedCount;
+    });
+    const pool = unsolved.length >= 12 ? unsolved : mapped;
+    return [...pool].sort((a, b) => this.scenarioScore(b, questions, context) - this.scenarioScore(a, questions, context));
+  }
+
+  private toDesignScenario(question: CatalogQuestion): DesignScenario {
+    return {
+      id: question.id,
+      title: question.heading,
+      difficulty: question.difficulty === "HARD" ? "SENIOR" : "MID",
+      prompt: question.description,
+      requirements: [
+        "Clarify requirements and scale assumptions",
+        "Define APIs and core entities",
+        "Explain storage, caching, reliability, and observability"
+      ],
+      constraints: this.jsonArray<string>(question.constraints)
+    };
+  }
+
+  private adaptiveOrder<T extends PracticeProblem>(questions: T[], context: PersonalizationContext) {
+    const weakTopics = new Map(context.topics.map((topic) => [topic.topic.toLowerCase(), Math.max(topic.targetScore - topic.proficiency, 0)]));
     const now = Date.now();
     return [...questions].sort((a, b) => {
-      const aReview = a.nextReviewAt ? new Date(a.nextReviewAt).getTime() <= now : false;
-      const bReview = b.nextReviewAt ? new Date(b.nextReviewAt).getTime() <= now : false;
-      const aScore = (aReview ? 100 : 0) + (weakTopics.get(a.topic.toLowerCase()) ?? 0) - (a.solvedCount ?? 0) * 8;
-      const bScore = (bReview ? 100 : 0) + (weakTopics.get(b.topic.toLowerCase()) ?? 0) - (b.solvedCount ?? 0) * 8;
-      return bScore - aScore;
+      const aScore = this.problemScore(a, context, weakTopics, now);
+      const bScore = this.problemScore(b, context, weakTopics, now);
+      return bScore - aScore || a.title.localeCompare(b.title);
     });
+  }
+
+  private problemScore(question: PracticeProblem, context: PersonalizationContext, weakTopics: Map<string, number>, now: number) {
+    const reviewDue = question.nextReviewAt ? new Date(question.nextReviewAt).getTime() <= now : false;
+    const skillHit = (question.skillKeys ?? []).some((key) => context.dueSkillKeys.has(key));
+    const targetCompanyHit = question.company ? context.targetCompanies.has(question.company.toLowerCase()) : false;
+    const weakTopicHit = [...context.weakTopics].some((topic) => question.topic.toLowerCase().includes(topic) || topic.includes(question.topic.toLowerCase()));
+    return (
+      (reviewDue ? 35 : 0) +
+      (weakTopics.get(question.topic.toLowerCase()) ?? 0) +
+      (weakTopicHit ? 30 : 0) +
+      (skillHit ? 24 : 0) +
+      (targetCompanyHit ? 18 : 0) +
+      this.difficultyFitScore(question.difficulty, context.readinessScore) -
+      (question.solvedCount ? (reviewDue ? 45 : 500) : 0) -
+      (question.solvedCount ?? 0) * 18
+    );
+  }
+
+  private scenarioScore(scenario: DesignScenario, source: CatalogQuestion[], context: PersonalizationContext) {
+    const question = source.find((item) => item.id === scenario.id);
+    const solved = question?.progress?.[0]?.solvedCount ?? 0;
+    const companyHit = question?.company ? context.targetCompanies.has(question.company.toLowerCase()) : false;
+    const systemWeak = context.weakTopics.has("system design") || [...context.dueSkillKeys].some((key) => key.startsWith("system."));
+    return (systemWeak ? 40 : 0) + (companyHit ? 18 : 0) + this.difficultyFitScore(question?.difficulty as PracticeProblem["difficulty"] ?? "MEDIUM", context.readinessScore) - solved * 500;
+  }
+
+  private difficultyFitScore(difficulty: PracticeProblem["difficulty"], readinessScore: number) {
+    if (readinessScore < 52) return difficulty === "EASY" ? 28 : difficulty === "MEDIUM" ? 10 : -18;
+    if (readinessScore < 76) return difficulty === "MEDIUM" ? 28 : difficulty === "EASY" ? 12 : 16;
+    return difficulty === "HARD" ? 30 : difficulty === "MEDIUM" ? 18 : 2;
+  }
+
+  private recommendationReason(question: PracticeProblem, context: PersonalizationContext) {
+    if (question.nextReviewAt && new Date(question.nextReviewAt) <= new Date()) return "Due for revision";
+    if (question.company && context.targetCompanies.has(question.company.toLowerCase())) return `Matches your ${question.company} prep`;
+    if ([...context.weakTopics].some((topic) => question.topic.toLowerCase().includes(topic) || topic.includes(question.topic.toLowerCase()))) return `Targets weak area: ${question.topic}`;
+    if ((question.skillKeys ?? []).some((key) => context.dueSkillKeys.has(key))) return "Matches your adaptive skill graph";
+    return question.solvedCount ? "Fallback revision question" : "New personalized question";
+  }
+
+  private jsonArray<T>(value: Prisma.JsonValue | null | undefined): T[] {
+    return Array.isArray(value) ? value as T[] : [];
   }
 
   private questionCreatePayload(input: QuestionInput, adminId: string): Prisma.QuestionCreateInput {
