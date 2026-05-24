@@ -13,7 +13,7 @@ export function useTodayArena(mode: "ranked" | "practice") {
       if (!accessToken) throw new Error("Sign in required");
       const response = await arenaApi.today(accessToken, mode);
       return response.data;
-    }
+    },
   });
 }
 
@@ -26,7 +26,7 @@ export function useOverallLeaderboard() {
       if (!accessToken) throw new Error("Sign in required");
       const response = await arenaApi.overall(accessToken);
       return response.data;
-    }
+    },
   });
 }
 
@@ -34,7 +34,12 @@ export function useSubmitArenaScore() {
   const accessToken = useAuthStore((state) => state.accessToken);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (body: { mode: "ranked" | "practice"; score: number; solved: number; penalty: number }) => {
+    mutationFn: async (body: {
+      mode: "ranked" | "practice";
+      score: number;
+      solved: number;
+      penalty: number;
+    }) => {
       if (!accessToken) throw new Error("Sign in required");
       const response = await arenaApi.submit(accessToken, body);
       return response.data;
@@ -42,6 +47,22 @@ export function useSubmitArenaScore() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["arena"] });
       void queryClient.invalidateQueries({ queryKey: ["adaptive"] });
-    }
+    },
+  });
+}
+
+export function useJoinArena() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (mode: "ranked" | "practice") => {
+      if (!accessToken) throw new Error("Sign in required");
+      const response = await arenaApi.join(accessToken, mode);
+      return response.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["arena"] });
+      void queryClient.invalidateQueries({ queryKey: ["billing", "status"] });
+    },
   });
 }

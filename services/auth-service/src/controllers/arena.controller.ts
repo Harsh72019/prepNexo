@@ -10,6 +10,12 @@ export class ArenaController {
     res.json({ data });
   };
 
+  join = async (req: Request, res: Response) => {
+    const mode = req.body.mode === "practice" ? "practice" : "ranked";
+    const data = await arena.join(req.user!.id, mode);
+    res.status(201).json({ data });
+  };
+
   submit = async (req: Request, res: Response) => {
     const data = await arena.submit(req.user!.id, req.body);
     res.json({ data });
