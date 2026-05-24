@@ -1,4 +1,4 @@
-import type { ApiResponse, AuthSession, AuthUser, DailyArena, DashboardSummary, GrowthProfile, OnboardingInput, OnboardingStatus, OverallLeaderboard, PracticeCatalog, PracticeTestCase, PressurePrompt, SkillNodeDto, SubmitAttemptInput } from "@interview-battlefield/types";
+import type { ApiResponse, AuthSession, AuthUser, CompanyTag, DailyArena, DashboardSummary, GrowthProfile, OnboardingInput, OnboardingStatus, OverallLeaderboard, PracticeCatalog, PracticeTestCase, PressurePrompt, QuestionType, SkillNodeDto, SubmitAttemptInput } from "@interview-battlefield/types";
 import { env } from "./env";
 
 type RequestOptions = RequestInit & {
@@ -87,7 +87,38 @@ export const practiceApi = {
       baseUrl: env.interviewServiceUrl,
       method: "POST",
       body: JSON.stringify(body)
+    }),
+  adminQuestions: (accessToken: string) => request<ApiResponse<QuestionAdminDto[]>>("/api/practice/admin/questions", { accessToken }),
+  saveAdminQuestion: (accessToken: string, body: QuestionAdminInput) =>
+    request<ApiResponse<QuestionAdminDto>>("/api/practice/admin/questions", {
+      accessToken,
+      method: "POST",
+      body: JSON.stringify(body)
     })
+};
+
+export type QuestionAdminInput = {
+  slug: string;
+  type: QuestionType;
+  topic: string;
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  company?: string | null;
+  companyTags: CompanyTag[];
+  heading: string;
+  description: string;
+  acceptanceText?: string | null;
+  starterCode?: string | null;
+  testCases: Array<{ input: number[]; expected: number | string | boolean | unknown[] | Record<string, unknown> }>;
+  examples: unknown[];
+  constraints: unknown[];
+  skillKeys: string[];
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+};
+
+export type QuestionAdminDto = QuestionAdminInput & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export const adaptiveApi = {

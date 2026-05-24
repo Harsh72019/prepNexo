@@ -119,6 +119,7 @@ export function LiveCodingRoom() {
 
     await submitAttempt.mutateAsync({
       kind: "LIVE_CODING",
+      questionId: currentProblem.slug ? currentProblem.id : undefined,
       title: currentProblem.title,
       topic: currentProblem.topic,
       score: payload.data.ok ? 88 : 45,
@@ -128,7 +129,8 @@ export function LiveCodingRoom() {
       problemsSolved: payload.data.ok ? 1 : 0,
       retryCount: consoleEntries.length,
       confidence: payload.data.ok ? 76 : 38,
-      communicationScore: 60
+      communicationScore: 60,
+      skillKeys: currentProblem.skillKeys
     });
 
     await askFollowUp(payload.data.ok);

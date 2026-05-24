@@ -51,6 +51,7 @@ model User {
   authTokens    AuthToken[]
   profile       UserProfile?
   attempts      InterviewAttempt[]
+  questionProgress UserQuestionProgress[]
   topicProgress TopicProgress[]
   dailyActivity DailyActivity[]
   roadmapItems  RoadmapItem[]
@@ -134,6 +135,8 @@ model InterviewAttempt {
   id              String        @id @default(cuid())
   userId          String
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId      String?
+  question        Question?     @relation(fields: [questionId], references: [id], onDelete: SetNull)
   kind            AttemptKind
   title           String
   topic           String
@@ -146,6 +149,56 @@ model InterviewAttempt {
 
   @@index([userId, completedAt])
   @@index([userId, kind])
+  @@index([questionId])
+}
+
+model Question {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  type            String
+  topic           String
+  difficulty      String
+  company         String?
+  companyTags     Json?
+  heading         String
+  description     String
+  acceptanceText  String?
+  starterCode     String?
+  testCases       Json?
+  examples        Json?
+  constraints     Json?
+  skillKeys       Json?
+  status          String        @default("DRAFT")
+  createdById     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  attempts        InterviewAttempt[]
+  progress        UserQuestionProgress[]
+
+  @@index([type, status])
+  @@index([topic])
+  @@index([difficulty])
+  @@index([company])
+}
+
+model UserQuestionProgress {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  attempts      Int       @default(0)
+  solvedCount   Int       @default(0)
+  bestScore     Int       @default(0)
+  lastStatus    String?
+  lastAttemptAt DateTime?
+  nextReviewAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, questionId])
+  @@index([userId, nextReviewAt])
+  @@index([userId, lastAttemptAt])
 }
 
 model TopicProgress {

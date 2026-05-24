@@ -99,14 +99,29 @@ export type PracticeTestCase = {
   expected: number;
 };
 
+export type QuestionType = "DSA" | "FRONTEND" | "BACKEND" | "SYSTEM_DESIGN" | "BEHAVIORAL";
+
+export type CompanyTag = "STARTUP" | "BIG_TECH" | "PRODUCT_BASED" | "MNC" | "SERVICE_BASED";
+
 export type PracticeProblem = {
   id: string;
+  slug?: string;
+  type?: QuestionType;
   title: string;
   topic: string;
   difficulty: "EASY" | "MEDIUM" | "HARD";
+  company?: string | null;
+  companyTags?: CompanyTag[];
   prompt: string;
+  acceptanceText?: string | null;
   starterCode: string;
   testCases: PracticeTestCase[];
+  examples?: unknown[];
+  skillKeys?: string[];
+  solvedCount?: number;
+  lastSolvedAt?: string | null;
+  nextReviewAt?: string | null;
+  recommendedReason?: string;
 };
 
 export type DesignScenario = {
@@ -127,6 +142,7 @@ export type PracticeCatalog = {
 
 export type SubmitAttemptInput = {
   kind: DashboardActivity["kind"];
+  questionId?: string;
   title: string;
   topic: string;
   score: number;

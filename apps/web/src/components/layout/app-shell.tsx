@@ -3,7 +3,7 @@
 import { Button } from "@interview-battlefield/ui/components/button";
 import { Skeleton } from "@interview-battlefield/ui/components/skeleton";
 import { motion } from "framer-motion";
-import { BarChart3, Bot, Code2, Flame, LayoutDashboard, LogOut, Moon, Network, Swords, Trophy, Zap } from "lucide-react";
+import { BarChart3, Bot, Code2, Flame, LayoutDashboard, LogOut, Moon, Network, Shield, Swords, Trophy, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {navItems.map((item) => {
+            {[...navItems, ...(user?.role === "ADMIN" ? [{ href: "/admin/questions", label: "Admin", icon: Shield }] : [])].map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
               return (

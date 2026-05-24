@@ -15,6 +15,9 @@ export function ProblemStatement({ problem }: { problem?: PracticeProblem }) {
           <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">{problem.topic}</span>
         </div>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{problem.prompt}</p>
+        {problem.acceptanceText ? (
+          <div className="mt-3 rounded-md border bg-background/60 p-3 text-sm leading-6 text-muted-foreground" dangerouslySetInnerHTML={{ __html: problem.acceptanceText }} />
+        ) : null}
       </div>
       <div className="grid gap-3">
         {visibleTests(problem.testCases).map((testCase, index) => (

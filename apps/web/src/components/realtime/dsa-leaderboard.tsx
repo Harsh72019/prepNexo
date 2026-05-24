@@ -251,6 +251,7 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
 
     await submitAttempt.mutateAsync({
       kind: "DSA_CONTEST",
+      questionId: currentProblem.slug ? currentProblem.id : undefined,
       title: currentProblem.title,
       topic: currentProblem.topic,
       score: Math.min(100, 62 + solved * 7),
@@ -258,7 +259,7 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
       status: "PASSED",
       feedbackSummary: `Accepted ${currentProblem.title} in today's DSA arena.`,
       problemsSolved: 1,
-      skillKeys: currentProblem.topic === "Dynamic Programming" ? ["dsa.dynamic_programming"] : undefined
+      skillKeys: currentProblem.skillKeys ?? (currentProblem.topic === "Dynamic Programming" ? ["dsa.dynamic_programming"] : undefined)
     });
     await submitArenaScore.mutateAsync({ mode: "ranked", score, solved, penalty: elapsedMinutes * 10 });
   }
