@@ -69,9 +69,20 @@ const lobbyMessages = [
   "Balancing speed and accuracy signals...",
   "Filling empty seats with human-like bots...",
 ];
+const arenaDurationSeconds = 45 * 60;
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function formatArenaTime(seconds: number) {
+  const minutes = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const rest = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${minutes}:${rest}`;
 }
 
 function arenaProblems(source: PracticeProblem[]) {
@@ -167,6 +178,8 @@ export function DsaLeaderboard({
   const [code, setCode] = useState("");
   const [consoleEntries, setConsoleEntries] = useState<ConsoleEntry[]>([]);
   const [startedAt, setStartedAt] = useState(Date.now());
+  const [remainingSeconds, setRemainingSeconds] =
+    useState(arenaDurationSeconds);
   const [pasteBlocked, setPasteBlocked] = useState(false);
   const [takenToday, setTakenToday] = useState(false);
 
@@ -178,6 +191,15 @@ export function DsaLeaderboard({
     problems.find((problem) => problem.id === selectedProblemId) ?? problems[0];
   const myEntry = entries.find((entry) => entry.userId === user.id);
   const joined = phase === "playing";
+  const myRank = myEntry
+    ? entries.findIndex((entry) => entry.userId === user.id) + 1
+    : null;
+  const leader = entries[0];
+  const nextRankEntry = myRank && myRank > 1 ? entries[myRank - 2] : null;
+  const pointsToClimb =
+    nextRankEntry && myEntry
+      ? Math.max(0, nextRankEntry.score - myEntry.score + 1)
+      : 0;
   const arenaLimitReached =
     billing.data?.dailyLimits.rankedArenas !== "UNLIMITED" &&
     billing.data?.dailyUsage.rankedArenas !== undefined &&
@@ -246,6 +268,7 @@ export function DsaLeaderboard({
 
   useEffect(() => {
     if (phase !== "playing") return;
+    setRemainingSeconds(arenaDurationSeconds);
     const interval = window.setInterval(() => {
       setEntries((current) => {
         const bots = current.filter((entry) => entry.userId.startsWith("bot-"));
@@ -269,9 +292,10 @@ export function DsaLeaderboard({
           )
           .sort((a, b) => b.score - a.score || a.penalty - b.penalty);
         setPlayers(updated);
+        const action = nextSolved > bot.solved ? "accepted" : "is hacking on";
         setFeed((items) =>
           [
-            `${bot.name} solved question ${nextSolved || 1} · ${nextScore} pts`,
+            `${bot.name} ${action} Q${nextSolved || 1} · ${nextScore} pts`,
             ...items,
           ].slice(0, 8),
         );
@@ -283,6 +307,18 @@ export function DsaLeaderboard({
       });
     }, 6000);
     return () => window.clearInterval(interval);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const timer = window.setInterval(() => {
+      setRemainingSeconds((current) => {
+        const next = Math.max(0, current - 1);
+        if (next === 0) setPhase("results");
+        return next;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
   }, [phase]);
 
   useEffect(() => {
@@ -379,6 +415,7 @@ export function DsaLeaderboard({
     const seeded = entries.length ? entries : buildArenaRoom();
     setPhase("playing");
     setStartedAt(Date.now());
+    setRemainingSeconds(arenaDurationSeconds);
     setEntries(seeded);
     setPlayers(seeded);
     setFeed(
@@ -463,7 +500,15 @@ export function DsaLeaderboard({
       1,
       Math.round((Date.now() - startedAt) / 60000),
     );
-    const score = solved * 250 + Math.max(0, 200 - elapsedMinutes * 8);
+    const difficultyBonus =
+      currentProblem.difficulty === "HARD"
+        ? 180
+        : currentProblem.difficulty === "MEDIUM"
+          ? 110
+          : 60;
+    const speedBonus = Math.max(0, Math.round(remainingSeconds / 12));
+    const streakBonus = solved >= 2 ? solved * 35 : 0;
+    const score = solved * 260 + difficultyBonus + speedBonus + streakBonus;
     const nextEntry = {
       userId: user.id,
       name: user.name,
@@ -481,7 +526,7 @@ export function DsaLeaderboard({
     setPlayers(updated);
     setFeed((items) =>
       [
-        `${user.name} accepted ${currentProblem.title} · ${score} pts`,
+        `${user.name} accepted ${currentProblem.title} · +${difficultyBonus + speedBonus + streakBonus} swing · ${score} pts`,
         ...items,
       ].slice(0, 8),
     );
@@ -688,20 +733,61 @@ export function DsaLeaderboard({
             <div className="grid gap-2 sm:grid-cols-3">
               <div className="rounded-md border bg-background/70 px-3 py-2 text-sm">
                 <span className="text-muted-foreground">Rank</span>
-                <p className="font-semibold">
-                  {myEntry
-                    ? `#${entries.findIndex((entry) => entry.userId === user.id) + 1}`
-                    : "-"}
-                </p>
+                <p className="font-semibold">{myRank ? `#${myRank}` : "-"}</p>
               </div>
               <div className="rounded-md border bg-background/70 px-3 py-2 text-sm">
                 <span className="text-muted-foreground">Solved</span>
                 <p className="font-semibold">{myEntry?.solved ?? 0}/4</p>
               </div>
-              <div className="flex items-center gap-2 rounded-md border bg-background/70 px-3 py-2 text-sm">
-                <Radio className="size-4 text-primary" />{" "}
-                {connected ? "Live" : "Offline"}
+              <div className="rounded-md border bg-background/70 px-3 py-2 text-sm">
+                <span className="text-muted-foreground">Time</span>
+                <p className="font-semibold">
+                  {formatArenaTime(remainingSeconds)}
+                </p>
               </div>
+            </div>
+          </section>
+
+          <section className="grid gap-3 md:grid-cols-[1fr_220px]">
+            <div className="flex gap-2 overflow-x-auto rounded-lg border bg-background/60 p-3">
+              {players.slice(0, 8).map((player, index) => (
+                <div
+                  key={player.userId}
+                  className={cn(
+                    "min-w-36 rounded-md border bg-background/70 p-3 text-sm",
+                    player.userId === user.id && "border-primary bg-primary/10",
+                  )}
+                >
+                  <p className="truncate font-semibold">
+                    #{index + 1} {player.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {player.solved}/4 solved · {player.score} pts
+                  </p>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${Math.min(100, player.solved * 25)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-lg border bg-background/60 p-3 text-sm">
+              <p className="flex items-center gap-2 font-semibold">
+                <Radio className="size-4 text-primary" />{" "}
+                {connected ? "Live room" : "Reconnecting"}
+              </p>
+              <p className="mt-2 text-muted-foreground">
+                {leader
+                  ? `${leader.name} leads with ${leader.score} pts.`
+                  : "Room is warming up."}
+              </p>
+              <p className="mt-1 text-muted-foreground">
+                {pointsToClimb
+                  ? `${pointsToClimb} pts to climb one rank.`
+                  : "You are in striking distance."}
+              </p>
             </div>
           </section>
 

@@ -13,6 +13,7 @@ type GenerateInput = {
 export class GeminiService {
   private cacheNames = new Map<string, string>();
   private cachePromises = new Map<string, Promise<string | undefined>>();
+  private unavailableCacheKeys = new Set<string>();
 
   private client() {
     if (!env.GEMINI_API_KEY) {
@@ -28,6 +29,7 @@ export class GeminiService {
 
   private async cachedContentName(input: GenerateInput) {
     if (!input.cacheKey || !input.cacheableContext) return undefined;
+    if (this.unavailableCacheKeys.has(input.cacheKey)) return undefined;
     const existing = this.cacheNames.get(input.cacheKey);
     if (existing) return existing;
 
@@ -51,8 +53,9 @@ export class GeminiService {
       })
       .catch((error) => {
         this.cachePromises.delete(input.cacheKey!);
+        this.unavailableCacheKeys.add(input.cacheKey!);
         console.warn(
-          "AI prompt cache unavailable; falling back to inline prompt",
+          `AI prompt cache unavailable for ${input.cacheKey}; falling back to inline prompt`,
           error,
         );
         return undefined;
