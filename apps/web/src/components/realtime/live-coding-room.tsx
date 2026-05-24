@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@inte
 import { cn } from "@interview-battlefield/ui/lib/utils";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { Bot, Brain, CheckCircle2, Clock, Code2, HelpCircle, Play, Send, ShieldAlert, Sparkles, Target, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { MarkdownContent } from "@/components/ai/markdown-content";
+import { useBillingStatus } from "@/hooks/use-billing";
 import { usePracticeCatalog, useRunCode, useSubmitAttempt } from "@/hooks/use-practice";
 import { aiStreamApi } from "@/lib/api";
 import { type CodeLanguage, languageOptions, monacoLanguage, starterForLanguage } from "@/lib/code-templates";
@@ -36,7 +39,9 @@ function adaptiveProblems(source: PracticeProblem[]) {
 }
 
 export function LiveCodingRoom() {
+  const router = useRouter();
   const catalog = usePracticeCatalog();
+  const billing = useBillingStatus();
   const runCode = useRunCode();
   const submitAttempt = useSubmitAttempt();
   const [screen, setScreen] = useState<"home" | "setup" | "round">("home");
@@ -63,6 +68,9 @@ export function LiveCodingRoom() {
 
   const currentProblem = questions[questionIndex];
   const maxFollowUps = remainingSeconds > 12 * 60 ? 2 : 1;
+  const aiInterviewLimitReached = billing.data?.dailyLimits.aiInterviews !== "UNLIMITED"
+    && billing.data?.dailyUsage.aiInterviews !== undefined
+    && billing.data.dailyUsage.aiInterviews >= billing.data.dailyLimits.aiInterviews;
 
   useEffect(() => {
     if (!started) return;
@@ -98,6 +106,11 @@ export function LiveCodingRoom() {
   };
 
   function startRound() {
+    if (aiInterviewLimitReached) {
+      toast.error("Free plan includes 1 AI interview per day. Upgrade to Pro for unlimited rounds.");
+      router.push("/billing");
+      return;
+    }
     const duration = roundDurations[interviewType] ?? 45 * 60;
     setScreen("round");
     setStarted(true);
@@ -285,9 +298,9 @@ export function LiveCodingRoom() {
               <p className="font-medium">{company} · {interviewType}</p>
               <p className="mt-1 text-sm text-muted-foreground">Three adaptive questions: easy, medium, hard. Paste is blocked inside the editor.</p>
             </div>
-            <Button onClick={startRound} disabled={!questions.length}>
+            <Button onClick={startRound} disabled={!questions.length || aiInterviewLimitReached}>
               <Play className="size-4" />
-              Start round
+              {aiInterviewLimitReached ? "Daily limit reached" : "Start round"}
             </Button>
           </CardContent>
         </Card>

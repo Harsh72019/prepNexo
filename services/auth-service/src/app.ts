@@ -8,6 +8,7 @@ import { errorHandler, notFound } from "./middlewares/error-handler.js";
 import { adaptiveRoutes } from "./routes/adaptive.routes.js";
 import { arenaRoutes } from "./routes/arena.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
+import { billingRoutes } from "./routes/billing.routes.js";
 import { dashboardRoutes } from "./routes/dashboard.routes.js";
 import { onboardingRoutes } from "./routes/onboarding.routes.js";
 import { practiceRoutes } from "./routes/practice.routes.js";
@@ -35,6 +36,7 @@ export function createApp() {
     authRoutes
   );
   app.use("/api/dashboard", dashboardRoutes);
+  app.use("/api/billing", billingRoutes);
   app.use("/api/practice", practiceRoutes);
   app.use("/api/adaptive", adaptiveRoutes);
   app.use("/api/onboarding", onboardingRoutes);

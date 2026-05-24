@@ -62,6 +62,8 @@ model User {
   userRating     UserRating?
   pressureEvents PressureEvent[]
   arenaEntries   ArenaEntry[]
+  subscriptions  UserSubscription[]
+  paymentOrders  PaymentOrder[]
 
   @@index([createdAt])
 }
@@ -395,4 +397,55 @@ model PressureEvent {
 
   @@index([userId, createdAt])
   @@index([userId, sessionId])
+}
+
+model BillingPlan {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String
+  amountPaise Int
+  currency    String   @default("INR")
+  intervalDays Int     @default(30)
+  features    Json?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      PaymentOrder[]
+}
+
+model PaymentOrder {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId          String
+  plan            BillingPlan @relation(fields: [planId], references: [id])
+  razorpayOrderId String   @unique
+  razorpayPaymentId String?
+  amountPaise     Int
+  currency        String   @default("INR")
+  status          String   @default("CREATED")
+  receipt         String
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+model UserSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planCode  String
+  status    String   @default("ACTIVE")
+  startedAt DateTime @default(now())
+  expiresAt DateTime
+  sourceOrderId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, expiresAt])
 }

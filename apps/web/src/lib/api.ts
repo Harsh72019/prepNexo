@@ -1,4 +1,4 @@
-import type { ApiResponse, AuthSession, AuthUser, CompanyTag, DailyArena, DashboardSummary, GrowthProfile, OnboardingInput, OnboardingStatus, OverallLeaderboard, PracticeCatalog, PracticeTestCase, PressurePrompt, QuestionType, SkillNodeDto, SubmitAttemptInput } from "@interview-battlefield/types";
+import type { ApiResponse, AuthSession, AuthUser, BillingPlanDto, BillingStatusDto, CompanyTag, DailyArena, DashboardSummary, GrowthProfile, OnboardingInput, OnboardingStatus, OverallLeaderboard, PracticeCatalog, PracticeTestCase, PressurePrompt, QuestionType, RazorpayCheckoutOrder, SkillNodeDto, SubmitAttemptInput } from "@interview-battlefield/types";
 import { env } from "./env";
 
 type RequestOptions = RequestInit & {
@@ -61,6 +61,32 @@ export const authApi = {
 
 export const dashboardApi = {
   summary: (accessToken: string) => request<ApiResponse<DashboardSummary>>("/api/dashboard/summary", { accessToken })
+};
+
+export const billingApi = {
+  plans: () => request<ApiResponse<BillingPlanDto[]>>("/api/billing/plans"),
+  status: (accessToken: string) => request<ApiResponse<BillingStatusDto>>("/api/billing/status", { accessToken }),
+  checkoutOrder: (accessToken: string, planCode: string) =>
+    request<ApiResponse<RazorpayCheckoutOrder>>("/api/billing/checkout-order", {
+      accessToken,
+      method: "POST",
+      body: JSON.stringify({ planCode }),
+      timeoutMs: 20_000
+    }),
+  verify: (accessToken: string, body: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
+    request<ApiResponse<BillingStatusDto>>("/api/billing/verify", {
+      accessToken,
+      method: "POST",
+      body: JSON.stringify(body),
+      timeoutMs: 20_000
+    }),
+  adminPlans: (accessToken: string) => request<ApiResponse<BillingPlanDto[]>>("/api/billing/admin/plans", { accessToken }),
+  saveAdminPlan: (accessToken: string, body: Omit<BillingPlanDto, "id">) =>
+    request<ApiResponse<BillingPlanDto>>("/api/billing/admin/plans", {
+      accessToken,
+      method: "POST",
+      body: JSON.stringify(body)
+    })
 };
 
 export const onboardingApi = {

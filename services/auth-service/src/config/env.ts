@@ -21,7 +21,10 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().default("PrepNexo <noreply@prepnexo.com>")
+  EMAIL_FROM: z.string().default("PrepNexo <noreply@prepnexo.com>"),
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional()
 }).superRefine((env, ctx) => {
   if (env.NODE_ENV !== "production") return;
 
@@ -48,6 +51,14 @@ const envSchema = z.object({
       code: z.ZodIssueCode.custom,
       path: ["GOOGLE_CLIENT_ID"],
       message: "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together"
+    });
+  }
+
+  if (Boolean(env.RAZORPAY_KEY_ID) !== Boolean(env.RAZORPAY_KEY_SECRET)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["RAZORPAY_KEY_ID"],
+      message: "RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be configured together"
     });
   }
 });

@@ -6,7 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@inte
 import { cn } from "@interview-battlefield/ui/lib/utils";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { CheckCircle2, Clock, Loader2, Play, Radio, Send, ShieldAlert, Sparkles, Swords, Trophy } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { useBillingStatus } from "@/hooks/use-billing";
 import { useSubmitArenaScore, useTodayArena } from "@/hooks/use-arena";
 import { useInterviewSocket } from "@/hooks/use-interview-socket";
 import { usePracticeCatalog, useRunCode, useSubmitAttempt } from "@/hooks/use-practice";
@@ -37,8 +40,10 @@ function arenaProblems(source: PracticeProblem[]) {
 }
 
 export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: string }) {
+  const router = useRouter();
   const { socket, connected } = useInterviewSocket();
   const catalog = usePracticeCatalog();
+  const billing = useBillingStatus();
   const runCode = useRunCode();
   const submitAttempt = useSubmitAttempt();
   const submitArenaScore = useSubmitArenaScore();
@@ -64,6 +69,9 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
   const currentProblem = problems.find((problem) => problem.id === selectedProblemId) ?? problems[0];
   const myEntry = entries.find((entry) => entry.userId === user.id);
   const joined = phase === "playing";
+  const arenaLimitReached = billing.data?.dailyLimits.rankedArenas !== "UNLIMITED"
+    && billing.data?.dailyUsage.rankedArenas !== undefined
+    && billing.data.dailyUsage.rankedArenas >= billing.data.dailyLimits.rankedArenas;
 
   useEffect(() => {
     if (!selectedProblemId && problems[0]) setSelectedProblemId(problems[0].id);
@@ -176,6 +184,11 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
   }
 
   function startMatchmaking() {
+    if (arenaLimitReached) {
+      toast.error("Free plan includes 1 ranked arena per day. Upgrade to Pro for more rooms.");
+      router.push("/billing");
+      return;
+    }
     setPhase("matching");
     setLobbyCountdown(12);
     setLobbyMessageIndex(0);
@@ -294,7 +307,7 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
               </div>
             </div>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              {takenToday ? (
+              {takenToday || arenaLimitReached ? (
                 <Button size="lg" onClick={showResults}>
                   <Trophy className="size-5" />
                   View today&apos;s results

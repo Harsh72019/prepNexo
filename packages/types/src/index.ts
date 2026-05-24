@@ -26,6 +26,46 @@ export type ApiResponse<T> = {
   meta?: Record<string, unknown>;
 };
 
+export type BillingPlanDto = {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  amountPaise: number;
+  currency: string;
+  intervalDays: number;
+  features: string[];
+  active: boolean;
+};
+
+export type BillingStatusDto = {
+  planCode: "FREE" | "PRO";
+  active: boolean;
+  expiresAt: string | null;
+  dailyLimits: {
+    aiInterviews: number | "UNLIMITED";
+    rankedArenas: number | "UNLIMITED";
+  };
+  dailyUsage: {
+    aiInterviews: number;
+    rankedArenas: number;
+  };
+};
+
+export type RazorpayCheckoutOrder = {
+  keyId: string;
+  orderId: string;
+  amountPaise: number;
+  currency: string;
+  planCode: string;
+  name: string;
+  description: string;
+  prefill: {
+    name: string;
+    email: string;
+  };
+};
+
 export type DashboardMetric = {
   label: string;
   value: string;

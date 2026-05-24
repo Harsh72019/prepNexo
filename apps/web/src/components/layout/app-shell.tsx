@@ -3,7 +3,7 @@
 import { Button } from "@interview-battlefield/ui/components/button";
 import { Skeleton } from "@interview-battlefield/ui/components/skeleton";
 import { motion } from "framer-motion";
-import { BarChart3, Bot, Code2, Flame, LayoutDashboard, LogOut, Moon, Network, Shield, Swords, Trophy, Zap } from "lucide-react";
+import { BarChart3, Bot, Code2, CreditCard, Flame, LayoutDashboard, LogOut, Moon, Network, Shield, Swords, Trophy, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -21,7 +21,8 @@ const navItems = [
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/system-design", label: "System design", icon: Network },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/ai-coach", label: "AI coach", icon: Bot }
+  { href: "/ai-coach", label: "AI coach", icon: Bot },
+  { href: "/billing", label: "Billing", icon: CreditCard }
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -82,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {[...navItems, ...(user?.role === "ADMIN" ? [{ href: "/admin/questions", label: "Admin", icon: Shield }] : [])].map((item) => {
+            {[...navItems, ...(user?.role === "ADMIN" ? [{ href: "/admin/questions", label: "Questions", icon: Shield }, { href: "/admin/billing", label: "Plans", icon: CreditCard }] : [])].map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
               return (
