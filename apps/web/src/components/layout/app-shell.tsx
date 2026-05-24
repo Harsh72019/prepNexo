@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {[...navItems, ...(user?.role === "ADMIN" ? [{ href: "/admin/questions", label: "Questions", icon: Shield }, { href: "/admin/billing", label: "Plans", icon: CreditCard }] : [])].map((item) => {
+            {[...navItems, ...(user?.role === "ADMIN" ? [{ href: "/admin", label: "Admin", icon: Shield }, { href: "/admin/questions", label: "Questions", icon: Shield }, { href: "/admin/billing", label: "Plans", icon: CreditCard }] : [])].map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
               return (
