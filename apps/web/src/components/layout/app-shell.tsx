@@ -49,10 +49,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex max-w-[1680px] flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <Link href="/dashboard" className="group flex min-w-0 items-center gap-3">
-              <span className="relative h-14 w-40 shrink-0 overflow-hidden rounded-lg border bg-card shadow-[0_14px_36px_hsl(var(--primary)/0.25)] sm:w-48">
-                <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="(min-width: 640px) 192px, 160px" className="object-cover transition-transform group-hover:scale-105" priority />
+              <span className="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg border bg-card p-1.5 shadow-[0_14px_36px_hsl(var(--primary)/0.25)] sm:size-16">
+                <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="64px" className="object-contain transition-transform group-hover:scale-105" priority />
               </span>
               <span className="min-w-0">
+                <span className="block text-base font-black tracking-normal text-foreground sm:text-lg">PrepNexo</span>
                 <span className="hidden items-center gap-1 text-xs font-medium text-muted-foreground sm:flex">
                   <Zap className="size-3 text-primary" />
                   Learn. Compete. Grow.

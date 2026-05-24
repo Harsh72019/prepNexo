@@ -6,7 +6,7 @@ import { Providers } from "@/components/providers";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.WEB_URL ?? "https://prepnexo.com"),
+  metadataBase: new URL(process.env.WEB_URL ?? "https://prepnexo.online"),
   title: "PrepNexo",
   description: "AI-powered interview prep where you learn, compete, and grow.",
   icons: {

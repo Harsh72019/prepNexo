@@ -23,9 +23,10 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
 
         <div className="relative z-10">
           <div className="inline-flex h-20 items-center rounded-lg border bg-background/78 px-3 shadow-[0_18px_50px_hsl(var(--primary)/0.18)] backdrop-blur-xl">
-            <span className="relative h-14 w-44 overflow-hidden rounded-md">
-              <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="176px" className="object-cover" priority />
+            <span className="relative size-14 overflow-hidden rounded-md">
+              <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="56px" className="object-contain" priority />
             </span>
+            <span className="ml-2 text-lg font-black tracking-normal">PrepNexo</span>
           </div>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -100,9 +101,10 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
           className="w-full max-w-md rounded-lg border bg-card/92 p-6 shadow-tactical backdrop-blur-xl"
         >
           <div className="mb-6 flex items-center gap-3 lg:hidden">
-            <span className="relative h-14 w-40 overflow-hidden rounded-lg border bg-background">
-              <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="160px" className="object-cover" priority />
+            <span className="relative size-14 overflow-hidden rounded-lg border bg-background p-1">
+              <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="56px" className="object-contain" priority />
             </span>
+            <span className="text-lg font-black tracking-normal">PrepNexo</span>
           </div>
           <h2 className="text-2xl font-semibold tracking-normal">{title}</h2>
           <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
