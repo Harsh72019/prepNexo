@@ -39,6 +39,10 @@ function adaptiveProblems(source: PracticeProblem[]) {
   return [easy, medium, hard].filter(Boolean) as PracticeProblem[];
 }
 
+function draftKey(problemId: string, language: CodeLanguage) {
+  return `prepnexo-ai-draft:${problemId}:${language}`;
+}
+
 export function LiveCodingRoom() {
   const router = useRouter();
   const catalog = usePracticeCatalog();
@@ -83,12 +87,21 @@ export function LiveCodingRoom() {
 
   useEffect(() => {
     if (!started || !currentProblem) return;
-    setCode(starterForLanguage(currentProblem, language));
+    const savedDraft = window.localStorage.getItem(draftKey(currentProblem.id, language));
+    setCode(savedDraft ?? starterForLanguage(currentProblem, language));
     setFollowUps([]);
     setFollowUpIndex(0);
     setInterviewerText(null);
     setConsoleEntries([]);
   }, [currentProblem, language, started]);
+
+  useEffect(() => {
+    if (!started || !currentProblem || !code.trim()) return;
+    const timeout = window.setTimeout(() => {
+      window.localStorage.setItem(draftKey(currentProblem.id, language), code);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [code, currentProblem, language, started]);
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyV, () => {
@@ -147,6 +160,9 @@ export function LiveCodingRoom() {
       skillKeys: currentProblem.skillKeys
     });
 
+    if (payload.data.ok) {
+      window.localStorage.removeItem(draftKey(currentProblem.id, language));
+    }
     await askFollowUp(payload.data.ok);
   }
 

@@ -39,6 +39,10 @@ function arenaProblems(source: PracticeProblem[]) {
   return [easy, medium, mediumHard, hard].filter(Boolean) as PracticeProblem[];
 }
 
+function draftKey(problemId: string, language: CodeLanguage) {
+  return `prepnexo-arena-draft:${todayKey()}:${problemId}:${language}`;
+}
+
 export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: string }) {
   const router = useRouter();
   const { socket, connected } = useInterviewSocket();
@@ -78,8 +82,18 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
   }, [problems, selectedProblemId]);
 
   useEffect(() => {
-    if (currentProblem) setCode(starterForLanguage(currentProblem, language));
+    if (!currentProblem) return;
+    const savedDraft = window.localStorage.getItem(draftKey(currentProblem.id, language));
+    setCode(savedDraft ?? starterForLanguage(currentProblem, language));
   }, [currentProblem, language]);
+
+  useEffect(() => {
+    if (!currentProblem || !code.trim()) return;
+    const timeout = window.setTimeout(() => {
+      window.localStorage.setItem(draftKey(currentProblem.id, language), code);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [code, currentProblem, language]);
 
   useEffect(() => {
     const saved = localStorage.getItem(`ib-arena-ranking-${todayKey()}`);
@@ -242,6 +256,7 @@ export function DsaLeaderboard({ contestId = "daily-dsa-arena" }: { contestId?: 
     }, ...entries].slice(0, 8));
     if (!payload.data.ok) return;
 
+    window.localStorage.removeItem(draftKey(currentProblem.id, language));
     const nextSolvedSet = new Set(solvedProblems);
     nextSolvedSet.add(currentProblem.id);
     setSolvedProblems(nextSolvedSet);
