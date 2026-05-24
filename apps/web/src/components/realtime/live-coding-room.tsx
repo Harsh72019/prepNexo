@@ -26,6 +26,7 @@ import {
   ShieldAlert,
   Sparkles,
   Target,
+  Trophy,
   XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -69,10 +70,49 @@ function formatTime(seconds: number) {
   return `${minutes}:${rest}`;
 }
 
-function adaptiveProblems(source: PracticeProblem[]) {
+const recentQuestionKey = "prepnexo-ai-recent-questions";
+
+function readRecentQuestions() {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(
+      window.localStorage.getItem(recentQuestionKey) ?? "[]",
+    );
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberInterviewProblems(problems: PracticeProblem[]) {
+  if (typeof window === "undefined") return;
+  const existing = readRecentQuestions();
+  const next = [
+    ...problems.flatMap((problem) => [
+      problem.id,
+      `family:${problemFamily(problem)}`,
+    ]),
+    ...existing,
+  ];
+  window.localStorage.setItem(
+    recentQuestionKey,
+    JSON.stringify([...new Set(next)].slice(0, 48)),
+  );
+}
+
+function adaptiveProblems(source: PracticeProblem[], recentKeys: string[]) {
   const picked: PracticeProblem[] = [];
+  const recent = new Set(recentKeys);
+  const notRecent = source.filter(
+    (problem) =>
+      !recent.has(problem.id) &&
+      !recent.has(`family:${problemFamily(problem)}`),
+  );
+  const base = notRecent.length >= 12 ? notRecent : source;
   const pick = (difficulty: PracticeProblem["difficulty"]) => {
-    const candidates = source.filter(
+    const candidates = base.filter(
       (problem) => problem.difficulty === difficulty,
     );
     return (
@@ -80,8 +120,8 @@ function adaptiveProblems(source: PracticeProblem[]) {
       candidates.find(
         (problem) => !picked.some((item) => item.id === problem.id),
       ) ??
-      source.find((problem) => isDiverse(problem, picked)) ??
-      source.find((problem) => !picked.some((item) => item.id === problem.id))
+      base.find((problem) => isDiverse(problem, picked)) ??
+      base.find((problem) => !picked.some((item) => item.id === problem.id))
     );
   };
 
@@ -137,6 +177,13 @@ export function LiveCodingRoom() {
   const [interviewerText, setInterviewerText] = useState<string | null>(null);
   const [aiStreaming, setAiStreaming] = useState(false);
   const [pasteBlocked, setPasteBlocked] = useState(false);
+  const [recentQuestionKeys, setRecentQuestionKeys] = useState<string[]>([]);
+  const [followUpOpen, setFollowUpOpen] = useState(false);
+  const [lastSubmissionSolved, setLastSubmissionSolved] = useState(false);
+
+  useEffect(() => {
+    setRecentQuestionKeys(readRecentQuestions());
+  }, []);
 
   const questions = useMemo(() => {
     const source = [
@@ -147,8 +194,12 @@ export function LiveCodingRoom() {
       (problem, index, array) =>
         array.findIndex((item) => item.id === problem.id) === index,
     );
-    return adaptiveProblems(unique);
-  }, [catalog.data?.codingProblems, catalog.data?.dsaProblems]);
+    return adaptiveProblems(unique, recentQuestionKeys);
+  }, [
+    catalog.data?.codingProblems,
+    catalog.data?.dsaProblems,
+    recentQuestionKeys,
+  ]);
 
   const currentProblem = questions[questionIndex];
   const maxFollowUps = remainingSeconds > 12 * 60 ? 2 : 1;
@@ -233,6 +284,8 @@ export function LiveCodingRoom() {
     setRemainingSeconds(duration);
     setQuestionIndex(0);
     if (questions[0]) setCode(starterForLanguage(questions[0], language));
+    rememberInterviewProblems(questions);
+    setRecentQuestionKeys(readRecentQuestions());
   }
 
   async function submitSolution() {
@@ -288,6 +341,8 @@ export function LiveCodingRoom() {
       return;
     }
     let streamedText = "";
+    setLastSubmissionSolved(solved);
+    setFollowUpOpen(true);
     setInterviewerText("");
     setAiStreaming(true);
     try {
@@ -358,6 +413,7 @@ export function LiveCodingRoom() {
   }
 
   function moveNextQuestion() {
+    setFollowUpOpen(false);
     setQuestionIndex((index) => Math.min(index + 1, questions.length - 1));
     if (questionIndex >= questions.length - 1) {
       setInterviewerText(
@@ -522,6 +578,68 @@ export function LiveCodingRoom() {
 
   return (
     <div className="grid gap-4">
+      {followUpOpen ? (
+        <div className="fixed inset-0 z-[80] grid place-items-center bg-background/80 p-4 backdrop-blur-md">
+          <div className="relative w-full max-w-2xl overflow-hidden rounded-lg border bg-card shadow-[0_28px_90px_rgb(0_0_0/0.38)]">
+            {lastSubmissionSolved ? (
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.32),transparent_32%),radial-gradient(circle_at_82%_12%,hsl(var(--accent)/0.28),transparent_34%)]" />
+            ) : null}
+            <div className="relative border-b p-5">
+              <div className="flex items-start gap-4">
+                <div
+                  className={cn(
+                    "grid size-14 place-items-center rounded-full border",
+                    lastSubmissionSolved
+                      ? "animate-pulse border-primary/50 bg-primary/15 text-primary"
+                      : "border-accent/50 bg-accent/10 text-accent",
+                  )}
+                >
+                  {lastSubmissionSolved ? (
+                    <Trophy className="size-7" />
+                  ) : (
+                    <Bot className="size-7" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-primary">
+                    {lastSubmissionSolved
+                      ? "Well done"
+                      : "Interviewer follow-up"}
+                  </p>
+                  <h3 className="mt-1 text-2xl font-black tracking-normal">
+                    {lastSubmissionSolved
+                      ? "Accepted. Now handle the follow-up."
+                      : "Good practice signal. Stay with the interviewer."}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {currentProblem?.title} · {followUpIndex}/{maxFollowUps}{" "}
+                    follow-ups
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="max-h-[55vh] overflow-auto p-5">
+              {interviewerText ? (
+                <MarkdownContent text={interviewerText} />
+              ) : (
+                <div className="grid gap-3">
+                  <div className="h-3 w-2/3 animate-pulse rounded-full bg-muted" />
+                  <div className="h-3 w-full animate-pulse rounded-full bg-muted" />
+                  <div className="h-3 w-4/5 animate-pulse rounded-full bg-muted" />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col-reverse gap-2 border-t p-4 sm:flex-row sm:justify-end">
+              <Button variant="outline" onClick={() => setFollowUpOpen(false)}>
+                Stay on question
+              </Button>
+              <Button onClick={moveNextQuestion} disabled={aiStreaming}>
+                Continue to next question
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <section className="arena-surface flex flex-col justify-between gap-4 rounded-lg border p-4 shadow-[0_18px_60px_rgb(0_0_0/0.22)] md:flex-row md:items-center">
         <div>
           <p className="text-sm font-medium text-primary">

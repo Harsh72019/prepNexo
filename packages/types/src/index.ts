@@ -139,9 +139,19 @@ export type PracticeTestCase = {
   expected: number;
 };
 
-export type QuestionType = "DSA" | "FRONTEND" | "BACKEND" | "SYSTEM_DESIGN" | "BEHAVIORAL";
+export type QuestionType =
+  | "DSA"
+  | "FRONTEND"
+  | "BACKEND"
+  | "SYSTEM_DESIGN"
+  | "BEHAVIORAL";
 
-export type CompanyTag = "STARTUP" | "BIG_TECH" | "PRODUCT_BASED" | "MNC" | "SERVICE_BASED";
+export type CompanyTag =
+  | "STARTUP"
+  | "BIG_TECH"
+  | "PRODUCT_BASED"
+  | "MNC"
+  | "SERVICE_BASED";
 
 export type PracticeProblem = {
   id: string;
@@ -158,8 +168,11 @@ export type PracticeProblem = {
   testCases: PracticeTestCase[];
   examples?: unknown[];
   skillKeys?: string[];
+  attemptedCount?: number;
   solvedCount?: number;
+  lastAttemptAt?: string | null;
   lastSolvedAt?: string | null;
+  lastStatus?: "PASSED" | "NEEDS_REVIEW" | "FAILED" | null;
   nextReviewAt?: string | null;
   recommendedReason?: string;
 };
@@ -295,7 +308,12 @@ export type GrowthProfile = {
 
 export type PressurePrompt = {
   id: string;
-  type: "INTERRUPTION" | "EDGE_CASE" | "REQUIREMENT_CHANGE" | "FAILURE_INJECTION" | "COMPLEXITY_CHALLENGE";
+  type:
+    | "INTERRUPTION"
+    | "EDGE_CASE"
+    | "REQUIREMENT_CHANGE"
+    | "FAILURE_INJECTION"
+    | "COMPLEXITY_CHALLENGE";
   prompt: string;
   severity: number;
   createdAt: string;
@@ -303,13 +321,28 @@ export type PressurePrompt = {
 
 export type OnboardingInput = {
   targetCompanies: string[];
-  experienceLevel: "Beginner" | "Intermediate" | "Advanced" | "Working professional";
-  preferredRole: "Backend" | "Frontend" | "Full Stack" | "SDE-1" | "SDE-2" | "System Design focused";
+  experienceLevel:
+    | "Beginner"
+    | "Intermediate"
+    | "Advanced"
+    | "Working professional";
+  preferredRole:
+    | "Backend"
+    | "Frontend"
+    | "Full Stack"
+    | "SDE-1"
+    | "SDE-2"
+    | "System Design focused";
   confidenceLevel: number;
   strongestTopics: string[];
   weakestTopics: string[];
   dailyPrepTime: "30 mins" | "1 hour" | "2+ hours";
-  learningStyle: "Competitive" | "Guided" | "Interview simulation" | "Concept-first" | "Fast-paced";
+  learningStyle:
+    | "Competitive"
+    | "Guided"
+    | "Interview simulation"
+    | "Concept-first"
+    | "Fast-paced";
   targetTimeline: "1 month" | "3 months" | "6 months";
   diagnostic?: {
     codingScore?: number;
@@ -394,7 +427,14 @@ export type LeaderboardEntry = {
 
 export type SystemDesignBlock = {
   id: string;
-  type: "client" | "gateway" | "service" | "database" | "cache" | "queue" | "storage";
+  type:
+    | "client"
+    | "gateway"
+    | "service"
+    | "database"
+    | "cache"
+    | "queue"
+    | "storage";
   label: string;
   x: number;
   y: number;
@@ -417,31 +457,100 @@ export type SystemDesignCanvasState = {
 export type ServerToClientEvents = {
   "room:state": (state: CodingRoomState) => void;
   "room:presence": (participants: RealtimeUser[]) => void;
-  "coding:patch": (payload: { roomId: string; code: string; user: RealtimeUser; updatedAt: string }) => void;
+  "coding:patch": (payload: {
+    roomId: string;
+    code: string;
+    user: RealtimeUser;
+    updatedAt: string;
+  }) => void;
   "console:event": (entry: ConsoleEntry) => void;
-  "leaderboard:update": (payload: { contestId: string; entries: LeaderboardEntry[] }) => void;
+  "leaderboard:update": (payload: {
+    contestId: string;
+    entries: LeaderboardEntry[];
+  }) => void;
   "system-design:state": (state: SystemDesignCanvasState) => void;
-  "system-design:block-updated": (payload: { roomId: string; block: SystemDesignBlock; user: RealtimeUser; updatedAt: string }) => void;
-  "system-design:connection-updated": (payload: { roomId: string; connection: SystemDesignConnection; user: RealtimeUser; updatedAt: string }) => void;
-  "system-design:connections-cleared": (payload: { roomId: string; user: RealtimeUser; updatedAt: string }) => void;
-  "system-design:block-deleted": (payload: { roomId: string; blockId: string; user: RealtimeUser; updatedAt: string }) => void;
-  "system-design:canvas-reset": (payload: { roomId: string; state: SystemDesignCanvasState; user: RealtimeUser }) => void;
+  "system-design:block-updated": (payload: {
+    roomId: string;
+    block: SystemDesignBlock;
+    user: RealtimeUser;
+    updatedAt: string;
+  }) => void;
+  "system-design:connection-updated": (payload: {
+    roomId: string;
+    connection: SystemDesignConnection;
+    user: RealtimeUser;
+    updatedAt: string;
+  }) => void;
+  "system-design:connections-cleared": (payload: {
+    roomId: string;
+    user: RealtimeUser;
+    updatedAt: string;
+  }) => void;
+  "system-design:block-deleted": (payload: {
+    roomId: string;
+    blockId: string;
+    user: RealtimeUser;
+    updatedAt: string;
+  }) => void;
+  "system-design:canvas-reset": (payload: {
+    roomId: string;
+    state: SystemDesignCanvasState;
+    user: RealtimeUser;
+  }) => void;
   "error:event": (payload: { message: string; code?: string }) => void;
 };
 
 export type ClientToServerEvents = {
   "room:join": (payload: { roomId: string; user: RealtimeUser }) => void;
   "room:leave": (payload: { roomId: string }) => void;
-  "coding:patch": (payload: { roomId: string; code: string; language: CodingRoomState["language"]; user: RealtimeUser }) => void;
-  "console:run": (payload: { roomId: string; code: string; language: CodingRoomState["language"]; user: RealtimeUser; testCases?: PracticeTestCase[] }) => void;
-  "leaderboard:join": (payload: { contestId: string; user: RealtimeUser }) => void;
-  "leaderboard:submit": (payload: { contestId: string; entry: LeaderboardEntry }) => void;
-  "system-design:join": (payload: { roomId: string; user: RealtimeUser }) => void;
-  "system-design:block-update": (payload: { roomId: string; block: SystemDesignBlock; user: RealtimeUser }) => void;
-  "system-design:connection-update": (payload: { roomId: string; connection: SystemDesignConnection; user: RealtimeUser }) => void;
-  "system-design:connections-clear": (payload: { roomId: string; user: RealtimeUser }) => void;
-  "system-design:block-delete": (payload: { roomId: string; blockId: string; user: RealtimeUser }) => void;
-  "system-design:canvas-reset": (payload: { roomId: string; user: RealtimeUser }) => void;
+  "coding:patch": (payload: {
+    roomId: string;
+    code: string;
+    language: CodingRoomState["language"];
+    user: RealtimeUser;
+  }) => void;
+  "console:run": (payload: {
+    roomId: string;
+    code: string;
+    language: CodingRoomState["language"];
+    user: RealtimeUser;
+    testCases?: PracticeTestCase[];
+  }) => void;
+  "leaderboard:join": (payload: {
+    contestId: string;
+    user: RealtimeUser;
+  }) => void;
+  "leaderboard:submit": (payload: {
+    contestId: string;
+    entry: LeaderboardEntry;
+  }) => void;
+  "system-design:join": (payload: {
+    roomId: string;
+    user: RealtimeUser;
+  }) => void;
+  "system-design:block-update": (payload: {
+    roomId: string;
+    block: SystemDesignBlock;
+    user: RealtimeUser;
+  }) => void;
+  "system-design:connection-update": (payload: {
+    roomId: string;
+    connection: SystemDesignConnection;
+    user: RealtimeUser;
+  }) => void;
+  "system-design:connections-clear": (payload: {
+    roomId: string;
+    user: RealtimeUser;
+  }) => void;
+  "system-design:block-delete": (payload: {
+    roomId: string;
+    blockId: string;
+    user: RealtimeUser;
+  }) => void;
+  "system-design:canvas-reset": (payload: {
+    roomId: string;
+    user: RealtimeUser;
+  }) => void;
 };
 
 export type InterServerEvents = {

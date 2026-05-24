@@ -271,8 +271,12 @@ export class PracticeService {
       skillKeys: this.jsonArray<string>(question.skillKeys).length
         ? this.jsonArray<string>(question.skillKeys)
         : skillKeysForTopic(question.topic),
+      attemptedCount: progress?.attempts ?? 0,
       solvedCount: progress?.solvedCount ?? 0,
+      lastAttemptAt: progress?.lastAttemptAt?.toISOString() ?? null,
       lastSolvedAt: progress?.lastAttemptAt?.toISOString() ?? null,
+      lastStatus:
+        (progress?.lastStatus as "PASSED" | "NEEDS_REVIEW" | "FAILED") ?? null,
       nextReviewAt: progress?.nextReviewAt?.toISOString() ?? null,
       recommendedReason: dueForReview
         ? "Due for revision"
@@ -333,20 +337,34 @@ export class PracticeService {
     context: PersonalizationContext,
     minimumUnsolvedBeforeRepeats: number,
   ) {
-    const unsolved = questions.filter((question) => !question.solvedCount);
+    const attemptedFamilies = new Set(
+      questions
+        .filter((question) => question.attemptedCount)
+        .map((question) => this.problemFamily(question)),
+    );
+    const freshNewFamily = questions.filter(
+      (question) =>
+        !question.attemptedCount &&
+        !attemptedFamilies.has(this.problemFamily(question)),
+    );
+    const fresh = questions.filter((question) => !question.attemptedCount);
+    const attempted = questions.filter((question) => question.attemptedCount);
+    const dueAttempted = attempted.filter(
+      (question) =>
+        question.nextReviewAt && new Date(question.nextReviewAt) <= new Date(),
+    );
     const pool =
-      unsolved.length >= minimumUnsolvedBeforeRepeats
-        ? unsolved
-        : [
-            ...unsolved,
-            ...questions.filter(
-              (question) =>
-                question.solvedCount &&
-                question.nextReviewAt &&
-                new Date(question.nextReviewAt) <= new Date(),
-            ),
-            ...questions.filter((question) => question.solvedCount),
-          ];
+      freshNewFamily.length >= minimumUnsolvedBeforeRepeats
+        ? freshNewFamily
+        : fresh.length >= minimumUnsolvedBeforeRepeats
+          ? fresh
+          : [
+              ...fresh,
+              ...dueAttempted,
+              ...attempted.filter(
+                (question) => !dueAttempted.includes(question),
+              ),
+            ];
 
     return this.adaptiveOrder(pool, context).map((question) => ({
       ...question,
@@ -431,8 +449,16 @@ export class PracticeService {
       (skillHit ? 24 : 0) +
       (targetCompanyHit ? 18 : 0) +
       this.difficultyFitScore(question.difficulty, context.readinessScore) -
-      (question.solvedCount ? (reviewDue ? 45 : 500) : 0) -
+      (question.attemptedCount ? (reviewDue ? 80 : 520) : 0) -
       (question.solvedCount ?? 0) * 18
+    );
+  }
+
+  private problemFamily(question: Pick<PracticeProblem, "slug" | "title">) {
+    const slug = question.slug ?? "";
+    return (
+      slug.match(/^prepnexo-dsa-(.+)-\d+$/)?.[1] ??
+      (question.title.split(":")[0] ?? question.title).trim().toLowerCase()
     );
   }
 
@@ -492,9 +518,8 @@ export class PracticeService {
       return `Targets weak area: ${question.topic}`;
     if ((question.skillKeys ?? []).some((key) => context.dueSkillKeys.has(key)))
       return "Matches your adaptive skill graph";
-    return question.solvedCount
-      ? "Fallback revision question"
-      : "New personalized question";
+    if (question.attemptedCount) return "Fallback revision question";
+    return "New personalized question";
   }
 
   private jsonArray<T>(value: Prisma.JsonValue | null | undefined): T[] {
