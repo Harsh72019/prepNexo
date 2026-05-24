@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "db:generate": "pnpm --filter @interview-battlefield/auth-service prisma:generate",
     "db:migrate": "pnpm --filter @interview-battlefield/auth-service prisma:migrate",
-    "db:seed": "pnpm --filter @interview-battlefield/auth-service prisma:seed"
+    "db:seed": "pnpm --filter @interview-battlefield/auth-service prisma:seed",
+    "question-bank:seed": "pnpm --filter @interview-battlefield/auth-service question-bank:seed"
   },
   "devDependencies": {
     "@interview-battlefield/config": "workspace:*",
