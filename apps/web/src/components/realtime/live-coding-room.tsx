@@ -14,6 +14,7 @@ import { useBillingStatus } from "@/hooks/use-billing";
 import { usePracticeCatalog, useRunCode, useSubmitAttempt } from "@/hooks/use-practice";
 import { aiStreamApi } from "@/lib/api";
 import { type CodeLanguage, languageOptions, monacoLanguage, starterForLanguage } from "@/lib/code-templates";
+import { ProblemStatement } from "./problem-statement";
 
 const roundDurations: Record<string, number> = {
   "DSA Round": 45 * 60,
@@ -155,6 +156,7 @@ export function LiveCodingRoom() {
       moveNextQuestion();
       return;
     }
+    let streamedText = "";
     setInterviewerText("");
     setAiStreaming(true);
     try {
@@ -164,19 +166,41 @@ export function LiveCodingRoom() {
           topic: currentProblem.topic,
           message: [
             `Problem: ${currentProblem.title}`,
+            `Prompt:\n${currentProblem.prompt}`,
+            `Visible test cases:\n${JSON.stringify(currentProblem.testCases?.slice(0, 4) ?? [], null, 2)}`,
+            `Expected interview signal:\n${currentProblem.acceptanceText ?? "Explain approach, edge cases, and complexity."}`,
             `Candidate ${solved ? "submitted a passing-looking solution" : "could not pass all tests"}.`,
-            `Ask exactly one realistic follow-up question. Make it adaptive. Do not include a full solution.`,
-            `Current code:\n${code}`
+            `Current code:\n${code}`,
+            [
+              "Respond in this exact structure:",
+              "1. Verdict: one short sentence.",
+              "2. Why/how: explain the intended approach and why it works, without giving a full copy-paste solution.",
+              "3. Complexity: time and space.",
+              "4. Follow-up: ask exactly one realistic adaptive follow-up question."
+            ].join("\n")
           ].join("\n")
         },
-        (token) => setInterviewerText((current) => `${current ?? ""}${token}`)
+        (token) => {
+          streamedText += token;
+          setInterviewerText((current) => `${current ?? ""}${token}`);
+        }
       );
-      setFollowUps((items) => [...items, interviewerText ?? "Follow-up asked by interviewer."]);
+      setFollowUps((items) => [...items, streamedText || "Follow-up asked by interviewer."]);
       setFollowUpIndex((index) => index + 1);
     } catch (error) {
       const fallback = solved
-        ? "Follow-up: What edge case would break this approach, and how would you test it?"
-        : "Follow-up: Explain the bug you suspect first and the smallest test case that exposes it.";
+        ? [
+            "Verdict: Your submission passed the runner checks.",
+            "Why/how: The intended solution should transform the prompt into a clear invariant, process the array once where possible, and prove that each update preserves the needed answer.",
+            "Complexity: Aim for linear or n log n time depending on the data structure, with minimal extra space.",
+            "Follow-up: What edge case would break this approach, and how would you test it?"
+          ].join("\n\n")
+        : [
+            "Verdict: The submission did not pass all checks.",
+            "Why/how: Start by matching the encoded input shape, then test the smallest case that proves your invariant before expanding to the full example set.",
+            "Complexity: After correctness, reduce brute force loops only if they exceed the expected scale.",
+            "Follow-up: Explain the bug you suspect first and the smallest test case that exposes it."
+          ].join("\n\n");
       setInterviewerText(error instanceof Error ? `${fallback}\n\nAI stream failed: ${error.message}` : fallback);
       setFollowUps((items) => [...items, fallback]);
       setFollowUpIndex((index) => index + 1);
@@ -332,10 +356,8 @@ export function LiveCodingRoom() {
       <Card>
         <CardContent className="p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="max-w-3xl">
-              <p className="text-xs font-medium uppercase text-muted-foreground">{currentProblem?.topic} · {currentProblem?.difficulty}</p>
-              <h3 className="mt-2 text-2xl font-semibold">{currentProblem?.title}</h3>
-              <p className="mt-3 text-base leading-7 text-foreground">{currentProblem?.prompt}</p>
+            <div className="max-w-4xl flex-1">
+              <ProblemStatement problem={currentProblem} />
             </div>
             <select value={language} onChange={(event) => setLanguage(event.target.value as CodeLanguage)} className="h-10 rounded-md border bg-background px-3 text-sm">
               {languageOptions.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
@@ -388,11 +410,11 @@ export function LiveCodingRoom() {
       <section className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Bot className="size-4 text-primary" /> Interviewer follow-up</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Bot className="size-4 text-primary" /> Feedback and follow-up</CardTitle>
             <CardDescription>{followUpIndex}/{maxFollowUps} follow-ups for this question.</CardDescription>
           </CardHeader>
           <CardContent>
-            {interviewerText ? <MarkdownContent text={interviewerText} /> : <p className="text-sm text-muted-foreground">Submit, mark unable to solve, or skip follow-up.</p>}
+            {interviewerText ? <MarkdownContent text={interviewerText} /> : <p className="text-sm text-muted-foreground">Submit to get verdict, approach explanation, complexity, and one adaptive follow-up.</p>}
           </CardContent>
         </Card>
 
