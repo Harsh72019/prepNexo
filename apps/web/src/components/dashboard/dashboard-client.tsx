@@ -41,7 +41,11 @@ export function DashboardClient() {
   const weakTopics = data.profile.weakestTopics?.length
     ? data.profile.weakestTopics
     : [...data.topics].sort((a, b) => b.gap - a.gap).slice(0, 3).map((topic) => topic.topic);
-  const bestTopics = [...data.topics].sort((a, b) => b.proficiency - a.proficiency).slice(0, 3);
+  const weakTopicNames = new Set(weakTopics.map((topic) => topic.toLowerCase()));
+  const bestTopics = [...data.topics]
+    .filter((topic) => topic.proficiency >= 70 && topic.attempts >= 2 && !weakTopicNames.has(topic.topic.toLowerCase()))
+    .sort((a, b) => b.proficiency - a.proficiency)
+    .slice(0, 3);
   const nextTasks = data.roadmap.filter((item) => !item.completedAt).slice(0, 3);
   const recent = data.recentActivity.slice(0, 5);
   const sessions = data.heatmap.reduce((sum, day) => sum + day.sessions, 0);
@@ -112,7 +116,7 @@ export function DashboardClient() {
             <CardDescription>Topics you can lean on.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">
-            {bestTopics.map((topic) => (
+            {bestTopics.length ? bestTopics.map((topic) => (
               <div key={topic.topic} className="rounded-md border bg-background/60 p-3">
                 <div className="flex items-center justify-between gap-3 text-sm">
                   <span className="font-medium">{topic.topic}</span>
@@ -122,7 +126,11 @@ export function DashboardClient() {
                   <div className="h-full rounded-full bg-primary" style={{ width: `${topic.proficiency}%` }} />
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="rounded-md border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
+                No proven strong area yet. Pass a few attempts and this will update.
+              </div>
+            )}
           </CardContent>
         </Card>
 

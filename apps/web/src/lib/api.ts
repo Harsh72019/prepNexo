@@ -1,4 +1,5 @@
 import type { ApiResponse, AuthSession, AuthUser, BillingPlanDto, BillingStatusDto, CompanyTag, DailyArena, DashboardSummary, GrowthProfile, OnboardingInput, OnboardingStatus, OverallLeaderboard, PracticeCatalog, PracticeTestCase, PressurePrompt, QuestionType, RazorpayCheckoutOrder, SkillNodeDto, SubmitAttemptInput } from "@interview-battlefield/types";
+import { useAuthStore } from "@/stores/auth-store";
 import { env } from "./env";
 
 type RequestOptions = RequestInit & {
@@ -8,6 +9,29 @@ type RequestOptions = RequestInit & {
 };
 
 async function request<T>(path: string, options: RequestOptions = {}) {
+  const response = await rawRequest(path, options);
+
+  if (response.status === 401 && options.accessToken) {
+    const refreshToken = useAuthStore.getState().refreshToken;
+    if (refreshToken && path !== "/api/auth/refresh") {
+      const refreshed = await rawRequest<ApiResponse<AuthSession>>("/api/auth/refresh", {
+        method: "POST",
+        body: JSON.stringify({ refreshToken })
+      });
+      if (refreshed.ok) {
+        const session = await refreshed.json() as ApiResponse<AuthSession>;
+        useAuthStore.getState().setSession(session.data);
+        const retried = await rawRequest<T>(path, { ...options, accessToken: session.data.accessToken });
+        return parseResponse<T>(retried);
+      }
+    }
+    useAuthStore.getState().clearSession();
+  }
+
+  return parseResponse<T>(response);
+}
+
+async function rawRequest<T = unknown>(path: string, options: RequestOptions = {}) {
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
   if (options.accessToken) headers.set("Authorization", `Bearer ${options.accessToken}`);
@@ -15,7 +39,7 @@ async function request<T>(path: string, options: RequestOptions = {}) {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
 
-  const response = await fetch(`${options.baseUrl ?? env.authServiceUrl}${path}`, {
+  return fetch(`${options.baseUrl ?? env.authServiceUrl}${path}`, {
     ...options,
     headers,
     signal: options.signal ?? controller.signal
@@ -25,7 +49,9 @@ async function request<T>(path: string, options: RequestOptions = {}) {
     }
     throw error;
   }).finally(() => window.clearTimeout(timeout));
+}
 
+async function parseResponse<T>(response: Response) {
   if (!response.ok) {
     const payload = await response.json().catch(() => ({ message: "Request failed" }));
     const issueText = payload.issues && typeof payload.issues === "object"

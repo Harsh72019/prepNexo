@@ -16,7 +16,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   JWT_ACCESS_SECRET: z.string().min(24),
   JWT_REFRESH_SECRET: z.string().min(24),
-  ACCESS_TOKEN_TTL: z.string().default("15m"),
+  ACCESS_TOKEN_TTL: z.string().default("45m"),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().default(30),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
