@@ -19,7 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuestionLibrary } from "@/hooks/use-practice";
 
 const pageSize = 12;
@@ -46,6 +46,18 @@ export function QuestionLibraryClient() {
   const [company, setCompany] = useState("");
   const [companyTag, setCompanyTag] = useState("");
   const [progress, setProgress] = useState("");
+
+  useEffect(() => {
+    const search = new URLSearchParams(window.location.search);
+    setQ(search.get("q") ?? "");
+    setType(search.get("type") ?? "");
+    setDifficulty(search.get("difficulty") ?? "");
+    setTopic(search.get("topic") ?? "");
+    setCompany(search.get("company") ?? "");
+    setCompanyTag(search.get("companyTag") ?? "");
+    setProgress(search.get("progress") ?? "");
+    setPage(Number(search.get("page")) || 1);
+  }, []);
   const params = useMemo(
     () => ({
       page,

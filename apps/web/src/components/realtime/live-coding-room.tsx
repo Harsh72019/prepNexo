@@ -153,6 +153,29 @@ function draftKey(problemId: string, language: CodeLanguage) {
   return `prepnexo-ai-draft:${problemId}:${language}`;
 }
 
+function interviewerFocus(company: string, interviewType: string) {
+  const normalized = company.toLowerCase();
+  const companySignal = normalized.includes("amazon")
+    ? "edge cases, ownership, and operational clarity"
+    : normalized.includes("google")
+      ? "invariants, tradeoffs, and clean reasoning"
+      : normalized.includes("microsoft")
+        ? "maintainability, communication, and correctness"
+        : normalized.includes("uber")
+          ? "latency, scale, and practical tradeoffs"
+          : "clarity, correctness, and adaptability";
+  const roundSignal = interviewType.includes("Backend")
+    ? "APIs, data flow, failure paths"
+    : interviewType.includes("Machine")
+      ? "requirements, modularity, execution"
+      : interviewType.includes("Debugging")
+        ? "hypothesis, smallest failing case, fix discipline"
+        : interviewType.includes("Low-Level")
+          ? "entities, interfaces, extensibility"
+          : "algorithm choice, edge cases, complexity";
+  return { companySignal, roundSignal };
+}
+
 export function LiveCodingRoom() {
   const router = useRouter();
   const catalog = usePracticeCatalog();
@@ -213,6 +236,7 @@ export function LiveCodingRoom() {
       : questionIndex === 1
         ? "core evaluation"
         : "bar raiser";
+  const focus = interviewerFocus(company, interviewType);
   const aiInterviewLimitReached =
     billing.data?.dailyLimits.aiInterviews !== "UNLIMITED" &&
     billing.data?.dailyUsage.aiInterviews !== undefined &&
@@ -572,6 +596,24 @@ export function LiveCodingRoom() {
             </Button>
           </CardContent>
         </Card>
+
+        <section className="grid gap-3 md:grid-cols-3">
+          {[
+            ["Company signal", focus.companySignal],
+            ["Round signal", focus.roundSignal],
+            ["Evaluation", "code, explanation, follow-up handling"],
+          ].map(([title, detail]) => (
+            <div
+              key={title}
+              className="rounded-lg border bg-card/76 p-4 shadow-sm"
+            >
+              <p className="text-sm font-semibold text-primary">{title}</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {detail}
+              </p>
+            </div>
+          ))}
+        </section>
       </div>
     );
   }
@@ -651,6 +693,10 @@ export function LiveCodingRoom() {
         </div>
         <div className="flex flex-wrap gap-2">
           <div className="flex h-10 items-center gap-2 rounded-md border bg-background/70 px-3 text-sm font-semibold">
+            <Target className="size-4 text-primary" />
+            {roundStage}
+          </div>
+          <div className="flex h-10 items-center gap-2 rounded-md border bg-background/70 px-3 text-sm font-semibold">
             <Clock className="size-4 text-primary" />
             {formatTime(remainingSeconds ?? 0)}
           </div>
@@ -661,6 +707,26 @@ export function LiveCodingRoom() {
             </div>
           ) : null}
         </div>
+      </section>
+
+      <section className="grid gap-3 md:grid-cols-3">
+        {[
+          ["Interviewer focus", focus.companySignal],
+          ["This round tests", focus.roundSignal],
+          [
+            "Current objective",
+            questionIndex === 0
+              ? "model the input and solve cleanly"
+              : questionIndex === 1
+                ? "handle pressure and edge cases"
+                : "explain tradeoffs like a bar raiser",
+          ],
+        ].map(([title, detail]) => (
+          <div key={title} className="rounded-lg border bg-card/70 p-3 text-sm">
+            <p className="font-semibold text-primary">{title}</p>
+            <p className="mt-1 text-muted-foreground">{detail}</p>
+          </div>
+        ))}
       </section>
 
       <Card>

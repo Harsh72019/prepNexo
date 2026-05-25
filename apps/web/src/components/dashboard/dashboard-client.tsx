@@ -1,9 +1,28 @@
 "use client";
 
 import { Button } from "@interview-battlefield/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@interview-battlefield/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@interview-battlefield/ui/components/card";
 import { cn } from "@interview-battlefield/ui/lib/utils";
-import { ArrowRight, Building2, CalendarDays, CheckCircle2, Clock, Flame, GraduationCap, Target } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Bot,
+  Building2,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Flame,
+  GraduationCap,
+  Network,
+  Swords,
+  Target,
+} from "lucide-react";
 import Link from "next/link";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { DashboardSkeleton } from "./dashboard-skeleton";
@@ -27,10 +46,18 @@ export function DashboardClient() {
   if (dashboard.isError) {
     return (
       <section className="rounded-lg border bg-card p-6 shadow-sm">
-        <p className="text-sm font-medium text-destructive">Dashboard unavailable</p>
-        <h2 className="mt-2 text-2xl font-semibold">Could not load your prep data.</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{dashboard.error.message}</p>
-        <Button className="mt-5" onClick={() => dashboard.refetch()}>Retry</Button>
+        <p className="text-sm font-medium text-destructive">
+          Dashboard unavailable
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold">
+          Could not load your prep data.
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {dashboard.error.message}
+        </p>
+        <Button className="mt-5" onClick={() => dashboard.refetch()}>
+          Retry
+        </Button>
       </section>
     );
   }
@@ -40,29 +67,77 @@ export function DashboardClient() {
 
   const weakTopics = data.profile.weakestTopics?.length
     ? data.profile.weakestTopics
-    : [...data.topics].sort((a, b) => b.gap - a.gap).slice(0, 3).map((topic) => topic.topic);
-  const weakTopicNames = new Set(weakTopics.map((topic) => topic.toLowerCase()));
+    : [...data.topics]
+        .sort((a, b) => b.gap - a.gap)
+        .slice(0, 3)
+        .map((topic) => topic.topic);
+  const weakTopicNames = new Set(
+    weakTopics.map((topic) => topic.toLowerCase()),
+  );
   const bestTopics = [...data.topics]
-    .filter((topic) => topic.proficiency >= 70 && topic.attempts >= 2 && !weakTopicNames.has(topic.topic.toLowerCase()))
+    .filter(
+      (topic) =>
+        topic.proficiency >= 70 &&
+        topic.attempts >= 2 &&
+        !weakTopicNames.has(topic.topic.toLowerCase()),
+    )
     .sort((a, b) => b.proficiency - a.proficiency)
     .slice(0, 3);
-  const nextTasks = data.roadmap.filter((item) => !item.completedAt).slice(0, 3);
+  const nextTasks = data.roadmap
+    .filter((item) => !item.completedAt)
+    .slice(0, 3);
   const recent = data.recentActivity.slice(0, 5);
   const sessions = data.heatmap.reduce((sum, day) => sum + day.sessions, 0);
   const solved = data.heatmap.reduce((sum, day) => sum + day.problemsSolved, 0);
   const minutes = data.heatmap.reduce((sum, day) => sum + day.minutes, 0);
+  const primaryWeakTopic = weakTopics[0] ?? "DSA fundamentals";
+  const dailyLoop = [
+    {
+      title: "Mock interview",
+      detail: "One realistic round with follow-ups",
+      href: "/coding",
+      icon: Bot,
+      tone: "primary",
+    },
+    {
+      title: "Daily arena",
+      detail: "One ranked room for pressure",
+      href: "/dsa-arena",
+      icon: Swords,
+      tone: "accent",
+    },
+    {
+      title: primaryWeakTopic,
+      detail: "Pick one targeted question",
+      href: `/questions?topic=${encodeURIComponent(primaryWeakTopic)}`,
+      icon: BookOpen,
+      tone: "neutral",
+    },
+    {
+      title: "System design rep",
+      detail: "One canvas, one critique",
+      href: "/system-design",
+      icon: Network,
+      tone: "neutral",
+    },
+  ];
 
   return (
     <div className="grid gap-6">
       <section className="arena-surface rounded-lg border p-5 shadow-[0_18px_60px_rgb(0_0_0/0.22)] md:p-6">
         <div className="grid gap-5 lg:grid-cols-[1fr_320px] lg:items-center">
           <div>
-            <p className="text-sm font-medium text-primary">Your prep dashboard</p>
+            <p className="text-sm font-medium text-primary">
+              Your prep dashboard
+            </p>
             <h2 className="mt-2 text-3xl font-black tracking-normal md:text-4xl">
-              {data.profile.headline ?? data.profile.targetRole ?? "Interview preparation"}
+              {data.profile.headline ??
+                data.profile.targetRole ??
+                "Interview preparation"}
             </h2>
             <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-              {data.profile.onboardingSummary ?? "This page shows your target, weak areas, next tasks, and recent attempts in plain language."}
+              {data.profile.onboardingSummary ??
+                "This page shows your target, weak areas, next tasks, and recent attempts in plain language."}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {data.profile.targetRole ? (
@@ -71,12 +146,17 @@ export function DashboardClient() {
                   {data.profile.targetRole}
                 </span>
               ) : null}
-              {(data.profile.targetCompanies ?? []).slice(0, 4).map((company) => (
-                <span key={company} className="inline-flex items-center gap-1 rounded-md border bg-background/70 px-3 py-1 text-sm">
-                  <Building2 className="size-4 text-primary" />
-                  {company}
-                </span>
-              ))}
+              {(data.profile.targetCompanies ?? [])
+                .slice(0, 4)
+                .map((company) => (
+                  <span
+                    key={company}
+                    className="inline-flex items-center gap-1 rounded-md border bg-background/70 px-3 py-1 text-sm"
+                  >
+                    <Building2 className="size-4 text-primary" />
+                    {company}
+                  </span>
+                ))}
               {data.profile.targetTimeline ? (
                 <span className="inline-flex items-center gap-1 rounded-md border bg-background/70 px-3 py-1 text-sm">
                   <CalendarDays className="size-4 text-primary" />
@@ -87,48 +167,123 @@ export function DashboardClient() {
           </div>
 
           <div className="rounded-lg border bg-background/75 p-5">
-            <p className="text-xs font-semibold uppercase text-muted-foreground">Readiness</p>
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
+              Readiness
+            </p>
             <div className="mt-2 flex items-end gap-2">
-              <span className="text-5xl font-black">{data.profile.readinessScore}%</span>
+              <span className="text-5xl font-black">
+                {data.profile.readinessScore}%
+              </span>
             </div>
-            <p className="mt-2 font-semibold">{readinessLabel(data.profile.readinessScore)}</p>
-            <p className="mt-1 text-sm text-muted-foreground">Calculated from recent attempts, scores, streak, and practice volume.</p>
+            <p className="mt-2 font-semibold">
+              {readinessLabel(data.profile.readinessScore)}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Calculated from recent attempts, scores, streak, and practice
+              volume.
+            </p>
           </div>
+        </div>
+      </section>
+
+      <section className="rounded-lg border bg-card/76 p-4 shadow-[0_18px_60px_rgb(0_0_0/0.16)]">
+        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+          <div>
+            <p className="text-sm font-semibold text-primary">
+              Today's training loop
+            </p>
+            <h3 className="mt-1 text-2xl font-black tracking-normal">
+              Do these four reps. Then stop guessing what to practice.
+            </h3>
+          </div>
+          <Button asChild>
+            <Link href="/coding">
+              Start now <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {dailyLoop.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className={cn(
+                  "group rounded-lg border bg-background/70 p-4 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-sm",
+                  index === 0 && "border-primary/35",
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="grid size-10 place-items-center rounded-md border bg-card text-primary">
+                    <Icon className="size-5" />
+                  </div>
+                  <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
+                    {index + 1}
+                  </span>
+                </div>
+                <p className="mt-3 font-semibold">{item.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {item.detail}
+                </p>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Target className="size-4 text-primary" /> Focus now</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Target className="size-4 text-primary" /> Focus now
+            </CardTitle>
             <CardDescription>Your weakest prep areas.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">
             {weakTopics.slice(0, 4).map((topic) => (
-              <div key={topic} className="rounded-md border bg-background/60 p-3 text-sm font-medium">{topic}</div>
+              <div
+                key={topic}
+                className="rounded-md border bg-background/60 p-3 text-sm font-medium"
+              >
+                {topic}
+              </div>
             ))}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><CheckCircle2 className="size-4 text-primary" /> Strong areas</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CheckCircle2 className="size-4 text-primary" /> Strong areas
+            </CardTitle>
             <CardDescription>Topics you can lean on.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2">
-            {bestTopics.length ? bestTopics.map((topic) => (
-              <div key={topic.topic} className="rounded-md border bg-background/60 p-3">
-                <div className="flex items-center justify-between gap-3 text-sm">
-                  <span className="font-medium">{topic.topic}</span>
-                  <span className="text-muted-foreground">{topic.proficiency}%</span>
+            {bestTopics.length ? (
+              bestTopics.map((topic) => (
+                <div
+                  key={topic.topic}
+                  className="rounded-md border bg-background/60 p-3"
+                >
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="font-medium">{topic.topic}</span>
+                    <span className="text-muted-foreground">
+                      {topic.proficiency}%
+                    </span>
+                  </div>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${topic.proficiency}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${topic.proficiency}%` }} />
-                </div>
-              </div>
-            )) : (
+              ))
+            ) : (
               <div className="rounded-md border border-dashed bg-background/60 p-3 text-sm text-muted-foreground">
-                No proven strong area yet. Pass a few attempts and this will update.
+                No proven strong area yet. Pass a few attempts and this will
+                update.
               </div>
             )}
           </CardContent>
@@ -136,7 +291,9 @@ export function DashboardClient() {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base"><Flame className="size-4 text-primary" /> Last 21 days</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Flame className="size-4 text-primary" /> Last 21 days
+            </CardTitle>
             <CardDescription>Simple practice totals.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-3 gap-2 text-center">
@@ -160,29 +317,49 @@ export function DashboardClient() {
         <Card>
           <CardHeader>
             <CardTitle>What to do next</CardTitle>
-            <CardDescription>Clear tasks based on your prep profile.</CardDescription>
+            <CardDescription>
+              Clear tasks based on your prep profile.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
-            {nextTasks.length ? nextTasks.map((item, index) => (
-              <div key={item.id} className="rounded-md border bg-background/60 p-3">
-                <div className="flex items-start gap-3">
-                  <span className="grid size-7 shrink-0 place-items-center rounded-md bg-primary text-sm font-black text-primary-foreground">{index + 1}</span>
-                  <div>
-                    <p className="font-semibold">{item.title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
-                    <p className="mt-2 text-xs uppercase text-muted-foreground">{item.topic} · {item.priority} priority</p>
+            {nextTasks.length ? (
+              nextTasks.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="rounded-md border bg-background/60 p-3"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="grid size-7 shrink-0 place-items-center rounded-md bg-primary text-sm font-black text-primary-foreground">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <p className="font-semibold">{item.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                      <p className="mt-2 text-xs uppercase text-muted-foreground">
+                        {item.topic} · {item.priority} priority
+                      </p>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                No tasks yet. Complete onboarding or submit practice attempts.
               </div>
-            )) : (
-              <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">No tasks yet. Complete onboarding or submit practice attempts.</div>
             )}
             <div className="flex flex-wrap gap-2 pt-1">
               <Button asChild>
-                <Link href="/coding">Do mock interview <ArrowRight className="size-4" /></Link>
+                <Link href="/coding">
+                  Do mock interview <ArrowRight className="size-4" />
+                </Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/dsa-arena">Practice DSA arena</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/questions">Browse questions</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/system-design">Practice system design</Link>
@@ -194,22 +371,36 @@ export function DashboardClient() {
         <Card>
           <CardHeader>
             <CardTitle>Topic progress</CardTitle>
-            <CardDescription>Where you stand against your target score.</CardDescription>
+            <CardDescription>
+              Where you stand against your target score.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
             {data.topics.slice(0, 7).map((topic) => (
-              <div key={topic.topic} className="rounded-md border bg-background/60 p-3">
+              <div
+                key={topic.topic}
+                className="rounded-md border bg-background/60 p-3"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <p className="font-semibold">{topic.topic}</p>
-                  <p className={cn("font-medium", topic.gap > 15 ? "text-accent" : "text-primary")}>
+                  <p
+                    className={cn(
+                      "font-medium",
+                      topic.gap > 15 ? "text-accent" : "text-primary",
+                    )}
+                  >
                     {topic.proficiency}% now · target {topic.targetScore}%
                   </p>
                 </div>
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${topic.proficiency}%` }} />
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${topic.proficiency}%` }}
+                  />
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {topic.attempts} attempts · {topic.gap > 0 ? `${topic.gap}% gap left` : "target reached"}
+                  {topic.attempts} attempts ·{" "}
+                  {topic.gap > 0 ? `${topic.gap}% gap left` : "target reached"}
                 </p>
               </div>
             ))}
@@ -219,26 +410,44 @@ export function DashboardClient() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Clock className="size-4 text-primary" /> Recent attempts</CardTitle>
-          <CardDescription>Your actual practice history, newest first.</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="size-4 text-primary" /> Recent attempts
+          </CardTitle>
+          <CardDescription>
+            Your actual practice history, newest first.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3">
-          {recent.length ? recent.map((activity) => (
-            <div key={activity.id} className="grid gap-3 rounded-md border bg-background/60 p-3 md:grid-cols-[1fr_90px] md:items-center">
-              <div>
-                <p className="font-semibold">{activity.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {activity.topic} · {readableKind(activity.kind)} · {new Date(activity.completedAt).toLocaleDateString()}
-                </p>
-                {activity.feedbackSummary ? <p className="mt-2 text-sm text-muted-foreground">{activity.feedbackSummary}</p> : null}
+          {recent.length ? (
+            recent.map((activity) => (
+              <div
+                key={activity.id}
+                className="grid gap-3 rounded-md border bg-background/60 p-3 md:grid-cols-[1fr_90px] md:items-center"
+              >
+                <div>
+                  <p className="font-semibold">{activity.title}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {activity.topic} · {readableKind(activity.kind)} ·{" "}
+                    {new Date(activity.completedAt).toLocaleDateString()}
+                  </p>
+                  {activity.feedbackSummary ? (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {activity.feedbackSummary}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="rounded-md border bg-background/70 p-3 text-center">
+                  <p className="text-2xl font-black">{activity.score}%</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activity.status.replace("_", " ").toLowerCase()}
+                  </p>
+                </div>
               </div>
-              <div className="rounded-md border bg-background/70 p-3 text-center">
-                <p className="text-2xl font-black">{activity.score}%</p>
-                <p className="text-xs text-muted-foreground">{activity.status.replace("_", " ").toLowerCase()}</p>
-              </div>
+            ))
+          ) : (
+            <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+              No attempts yet. Start with a mock interview or DSA arena.
             </div>
-          )) : (
-            <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">No attempts yet. Start with a mock interview or DSA arena.</div>
           )}
         </CardContent>
       </Card>
