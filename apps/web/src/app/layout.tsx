@@ -9,12 +9,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.WEB_URL ?? "https://prepnexo.online"),
   applicationName: "PrepNexo",
   title: {
-    default:
-      "PrepNexo - AI Interview Prep, DSA Arena, and System Design Practice",
+    default: "PrepNexo - Train for Real Technical Interviews",
     template: "%s | PrepNexo",
   },
   description:
-    "PrepNexo is an AI-powered interview preparation platform with realistic mock interviews, daily DSA arena battles, system design practice, analytics, and adaptive prep plans.",
+    "PrepNexo helps candidates train for real technical interviews with AI mock interviews, daily DSA arena battles, system design practice, adaptive analytics, and focused prep plans.",
   keywords: [
     "PrepNexo",
     "prepnexo",
@@ -59,8 +58,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "PrepNexo",
     url: "/",
-    title:
-      "PrepNexo - AI Interview Prep, DSA Arena, and System Design Practice",
+    title: "PrepNexo - Train for Real Technical Interviews",
     description:
       "Practice realistic AI interviews, compete in daily DSA arenas, improve system design, and track prep growth with PrepNexo.",
     images: [
@@ -74,9 +72,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "PrepNexo - AI Interview Prep",
+    title: "PrepNexo - Train for Real Technical Interviews",
     description:
-      "Realistic AI interviews, daily DSA arena battles, system design practice, and adaptive analytics.",
+      "AI mock interviews, daily DSA arena battles, system design practice, and adaptive analytics.",
     images: ["/brand/logo.png"],
   },
 };

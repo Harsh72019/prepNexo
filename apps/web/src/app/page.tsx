@@ -12,9 +12,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "PrepNexo - AI Interview Prep, DSA Arena, and System Design Practice",
+  title: "PrepNexo - Train for Real Technical Interviews",
   description:
-    "PrepNexo helps candidates prepare for software engineering interviews with realistic AI interviews, daily DSA arena battles, system design practice, and adaptive analytics.",
+    "PrepNexo helps candidates train for real technical interviews with AI mock interviews, daily DSA arena battles, system design practice, and adaptive analytics.",
   alternates: {
     canonical: "/",
   },
@@ -56,7 +56,7 @@ const jsonLd = {
   applicationCategory: "EducationalApplication",
   operatingSystem: "Web",
   description:
-    "PrepNexo is an AI-powered interview preparation platform for software engineering candidates, with AI mock interviews, DSA arena battles, system design practice, and adaptive analytics.",
+    "PrepNexo helps software engineering candidates train for real technical interviews with AI mock interviews, DSA arena battles, system design practice, and adaptive analytics.",
   image: "https://prepnexo.online/brand/logo.png",
   brand: {
     "@type": "Brand",
@@ -138,11 +138,10 @@ export default function HomePage() {
           <div>
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-background/70 px-4 py-2 text-sm font-semibold text-primary">
               <Zap className="size-4" />
-              AI interview prep for serious candidates
+              Train for real technical interviews
             </div>
             <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-normal md:text-6xl">
-              PrepNexo helps you crack software interviews with realistic
-              practice.
+              PrepNexo helps you train for real technical interviews.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
               Practice AI mock interviews, compete in the daily DSA arena,
@@ -228,7 +227,8 @@ export default function HomePage() {
         <div className="max-w-3xl">
           <p className="text-sm font-semibold text-primary">Why PrepNexo</p>
           <h2 className="mt-2 text-3xl font-black tracking-normal md:text-4xl">
-            One place to learn, compete, and grow.
+            AI mock interviews, DSA battles, and system design practice in one
+            loop.
           </h2>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -255,7 +255,7 @@ export default function HomePage() {
           <div>
             <p className="text-sm font-semibold text-primary">PrepNexo</p>
             <h2 className="mt-2 text-2xl font-black tracking-normal">
-              Start your interview prep loop today.
+              Start training for real technical interviews today.
             </h2>
           </div>
           <Button asChild size="lg">
