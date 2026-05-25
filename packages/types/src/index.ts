@@ -193,6 +193,23 @@ export type PracticeCatalog = {
   designScenarios: DesignScenario[];
 };
 
+export type QuestionLibraryFilters = {
+  types: QuestionType[];
+  difficulties: Array<PracticeProblem["difficulty"]>;
+  topics: string[];
+  companies: string[];
+  companyTags: CompanyTag[];
+};
+
+export type QuestionLibraryResult = {
+  questions: PracticeProblem[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  filters: QuestionLibraryFilters;
+};
+
 export type SubmitAttemptInput = {
   kind: DashboardActivity["kind"];
   questionId?: string;

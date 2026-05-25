@@ -10,6 +10,29 @@ export class PracticeController {
     res.json({ data: catalog });
   };
 
+  questionLibrary = async (req: Request, res: Response) => {
+    const library = await practice.questionLibrary(req.user!.id, {
+      page: Number(req.query.page),
+      pageSize: Number(req.query.pageSize),
+      q: typeof req.query.q === "string" ? req.query.q : undefined,
+      type: typeof req.query.type === "string" ? req.query.type : undefined,
+      difficulty:
+        typeof req.query.difficulty === "string"
+          ? req.query.difficulty
+          : undefined,
+      topic: typeof req.query.topic === "string" ? req.query.topic : undefined,
+      company:
+        typeof req.query.company === "string" ? req.query.company : undefined,
+      companyTag:
+        typeof req.query.companyTag === "string"
+          ? req.query.companyTag
+          : undefined,
+      progress:
+        typeof req.query.progress === "string" ? req.query.progress : undefined,
+    });
+    res.json({ data: library });
+  };
+
   submitAttempt = async (req: Request, res: Response) => {
     const attempt = await practice.submitAttempt(req.user!.id, req.body);
     res.status(201).json({ data: attempt });
@@ -26,7 +49,8 @@ export class PracticeController {
   };
 
   updateQuestion = async (req: Request, res: Response) => {
-    if (!req.params.id) throw new HttpError(400, "Missing question id", "MISSING_QUESTION_ID");
+    if (!req.params.id)
+      throw new HttpError(400, "Missing question id", "MISSING_QUESTION_ID");
     const question = await practice.updateQuestion(req.params.id, req.body);
     res.json({ data: question });
   };

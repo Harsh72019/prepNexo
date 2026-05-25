@@ -13,6 +13,7 @@ import type {
   OverallLeaderboard,
   PracticeCatalog,
   PracticeTestCase,
+  QuestionLibraryResult,
   PressurePrompt,
   QuestionType,
   RazorpayCheckoutOrder,
@@ -211,6 +212,29 @@ export const practiceApi = {
     request<ApiResponse<PracticeCatalog>>("/api/practice/catalog", {
       accessToken,
     }),
+  questions: (
+    accessToken: string,
+    params: {
+      page?: number;
+      pageSize?: number;
+      q?: string;
+      type?: string;
+      difficulty?: string;
+      topic?: string;
+      company?: string;
+      companyTag?: string;
+      progress?: string;
+    },
+  ) => {
+    const search = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") search.set(key, String(value));
+    });
+    return request<ApiResponse<QuestionLibraryResult>>(
+      `/api/practice/questions?${search.toString()}`,
+      { accessToken },
+    );
+  },
   submitAttempt: (accessToken: string, body: SubmitAttemptInput) =>
     request<ApiResponse<{ id: string }>>("/api/practice/attempts", {
       accessToken,

@@ -2,6 +2,8 @@ import type {
   CompanyTag,
   DesignScenario,
   PracticeProblem,
+  QuestionLibraryResult,
+  QuestionType,
   SubmitAttemptInput,
 } from "@interview-battlefield/types";
 import { AttemptKind, AttemptStatus, Prisma } from "@prisma/client";
@@ -50,6 +52,38 @@ type PersonalizationContext = {
   readinessScore: number;
   topics: TopicSignal[];
 };
+
+type QuestionLibraryInput = {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  type?: string;
+  difficulty?: string;
+  topic?: string;
+  company?: string;
+  companyTag?: string;
+  progress?: string;
+};
+
+const questionTypes: QuestionType[] = [
+  "DSA",
+  "FRONTEND",
+  "BACKEND",
+  "SYSTEM_DESIGN",
+  "BEHAVIORAL",
+];
+const questionDifficulties: Array<PracticeProblem["difficulty"]> = [
+  "EASY",
+  "MEDIUM",
+  "HARD",
+];
+const questionCompanyTags: CompanyTag[] = [
+  "STARTUP",
+  "BIG_TECH",
+  "PRODUCT_BASED",
+  "MNC",
+  "SERVICE_BASED",
+];
 
 export class PracticeService {
   private adaptiveService = new AdaptiveService();
@@ -120,6 +154,113 @@ export class PracticeService {
 
   async listQuestions() {
     return prisma.question.findMany({ orderBy: [{ updatedAt: "desc" }] });
+  }
+
+  async questionLibrary(
+    userId: string,
+    input: QuestionLibraryInput,
+  ): Promise<QuestionLibraryResult> {
+    const page = Math.max(Number(input.page) || 1, 1);
+    const pageSize = Math.min(Math.max(Number(input.pageSize) || 12, 6), 48);
+    const where: Prisma.QuestionWhereInput = { status: "ACTIVE" };
+    const query = input.q?.trim();
+
+    if (query) {
+      where.OR = [
+        { heading: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+        { topic: { contains: query, mode: "insensitive" } },
+        { company: { contains: query, mode: "insensitive" } },
+      ];
+    }
+    if (input.type && questionTypes.includes(input.type as QuestionType)) {
+      where.type = input.type;
+    }
+    if (
+      input.difficulty &&
+      questionDifficulties.includes(
+        input.difficulty as PracticeProblem["difficulty"],
+      )
+    ) {
+      where.difficulty = input.difficulty;
+    }
+    if (input.topic) {
+      where.topic = { equals: input.topic, mode: "insensitive" };
+    }
+    if (input.company) {
+      where.company = { equals: input.company, mode: "insensitive" };
+    }
+    if (
+      input.companyTag &&
+      questionCompanyTags.includes(input.companyTag as CompanyTag)
+    ) {
+      where.companyTags = {
+        array_contains: input.companyTag,
+      } as Prisma.JsonFilter<"Question">;
+    }
+    if (input.progress === "unsolved") {
+      where.progress = {
+        none: {
+          userId,
+          solvedCount: { gt: 0 },
+        },
+      };
+    }
+    if (input.progress === "solved") {
+      where.progress = {
+        some: {
+          userId,
+          solvedCount: { gt: 0 },
+        },
+      };
+    }
+    if (input.progress === "attempted") {
+      where.progress = {
+        some: {
+          userId,
+          attempts: { gt: 0 },
+        },
+      };
+    }
+
+    const [questions, total, filterSource] = await Promise.all([
+      prisma.question.findMany({
+        where,
+        include: { progress: { where: { userId }, take: 1 } },
+        orderBy: [{ createdAt: "desc" }, { updatedAt: "desc" }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.question.count({ where }),
+      prisma.question.findMany({
+        where: { status: "ACTIVE" },
+        select: { topic: true, company: true },
+        orderBy: [{ topic: "asc" }, { company: "asc" }],
+      }),
+    ]);
+
+    return {
+      questions: questions.map((question) => this.toPracticeProblem(question)),
+      page,
+      pageSize,
+      total,
+      totalPages: Math.max(Math.ceil(total / pageSize), 1),
+      filters: {
+        types: questionTypes,
+        difficulties: questionDifficulties,
+        topics: [...new Set(filterSource.map((item) => item.topic))]
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b)),
+        companies: [
+          ...new Set(
+            filterSource
+              .map((item) => item.company)
+              .filter((company): company is string => Boolean(company)),
+          ),
+        ].sort((a, b) => a.localeCompare(b)),
+        companyTags: questionCompanyTags,
+      },
+    };
   }
 
   async upsertQuestion(adminId: string, input: QuestionInput) {
