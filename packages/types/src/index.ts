@@ -39,7 +39,7 @@ export type BillingPlanDto = {
 };
 
 export type BillingStatusDto = {
-  planCode: "FREE" | "PRO";
+  planCode: "FREE" | "PRO" | "PRO_YEARLY";
   active: boolean;
   expiresAt: string | null;
   dailyLimits: {

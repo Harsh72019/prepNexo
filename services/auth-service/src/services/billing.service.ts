@@ -19,6 +19,9 @@ type RazorpayOrderResponse = {
 
 type PlanInput = Omit<BillingPlanDto, "id">;
 
+const paidPlanCodes = ["PRO", "PRO_YEARLY"];
+const paidAiInterviewDailyLimit = 8;
+
 const defaultPlans: PlanInput[] = [
   {
     code: "FREE",
@@ -38,13 +41,31 @@ const defaultPlans: PlanInput[] = [
     code: "PRO",
     name: "PrepNexo Pro",
     description:
-      "Unlimited interview practice with deeper feedback and analytics.",
+      "Serious interview practice with fair-usage AI rounds, company modes, and advanced analytics.",
     amountPaise: 39900,
     currency: "INR",
     intervalDays: 30,
     active: true,
     features: [
-      "Unlimited AI interviews",
+      "AI interviews under fair usage",
+      "Company-specific modes",
+      "Advanced analytics",
+      "Interview history",
+      "Detailed AI feedback",
+    ],
+  },
+  {
+    code: "PRO_YEARLY",
+    name: "PrepNexo Pro Yearly",
+    description: "Best value for serious prep with a full year of Pro access.",
+    amountPaise: 299900,
+    currency: "INR",
+    intervalDays: 365,
+    active: true,
+    features: [
+      "Everything in Pro monthly",
+      "Lower effective monthly price",
+      "AI interviews under fair usage",
       "Company-specific modes",
       "Advanced analytics",
       "Interview history",
@@ -140,7 +161,7 @@ export class BillingService {
         where: {
           userId,
           status: "ACTIVE",
-          planCode: "PRO",
+          planCode: { in: paidPlanCodes },
           expiresAt: { gt: now },
         },
         orderBy: { expiresAt: "desc" },
@@ -172,10 +193,13 @@ export class BillingService {
     }
 
     return {
-      planCode: "PRO",
+      planCode: subscription.planCode as BillingStatusDto["planCode"],
       active: true,
       expiresAt: subscription.expiresAt.toISOString(),
-      dailyLimits: { aiInterviews: "UNLIMITED", rankedArenas: 1 },
+      dailyLimits: {
+        aiInterviews: paidAiInterviewDailyLimit,
+        rankedArenas: "UNLIMITED",
+      },
       dailyUsage: { aiInterviews, rankedArenas },
     };
   }
@@ -186,7 +210,7 @@ export class BillingService {
       where: {
         userId,
         status: "ACTIVE",
-        planCode: "PRO",
+        planCode: { in: paidPlanCodes },
         expiresAt: { gt: now },
       },
       select: { id: true },
@@ -195,7 +219,6 @@ export class BillingService {
   }
 
   async assertAiInterviewAvailable(userId: string) {
-    if (await this.hasActivePro(userId)) return;
     const now = new Date();
     const startOfDay = new Date(now);
     startOfDay.setHours(0, 0, 0, 0);
@@ -207,10 +230,20 @@ export class BillingService {
         completedAt: { gte: startOfDay, lt: endOfDay },
       },
     });
+    if (await this.hasActivePro(userId)) {
+      if (usedToday >= paidAiInterviewDailyLimit) {
+        throw new HttpError(
+          402,
+          `Pro includes AI interviews under fair usage. Today's limit is ${paidAiInterviewDailyLimit} full rounds.`,
+          "PRO_AI_INTERVIEW_FAIR_USAGE_REACHED",
+        );
+      }
+      return;
+    }
     if (usedToday >= 1) {
       throw new HttpError(
         402,
-        "Free plan includes 1 AI interview per day. Upgrade to Pro for unlimited rounds.",
+        "Free plan includes 1 AI interview per day. Upgrade to Pro for fair-usage AI rounds.",
         "FREE_AI_INTERVIEW_LIMIT_REACHED",
       );
     }
@@ -347,7 +380,7 @@ export class BillingService {
     const currentSubscription = await prisma.userSubscription.findFirst({
       where: {
         userId,
-        planCode: order.plan.code,
+        planCode: { in: paidPlanCodes },
         status: "ACTIVE",
         expiresAt: { gt: now },
       },

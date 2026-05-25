@@ -272,7 +272,7 @@ export function LiveCodingRoom() {
   function startRound() {
     if (aiInterviewLimitReached) {
       toast.error(
-        "Free plan includes 1 AI interview per day. Upgrade to Pro for unlimited rounds.",
+        "Free plan includes 1 AI interview per day. Upgrade to Pro for fair-usage AI rounds.",
       );
       router.push("/billing");
       return;

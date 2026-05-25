@@ -82,6 +82,18 @@ const jsonLd = {
         billingDuration: "P1M",
       },
     },
+    {
+      "@type": "Offer",
+      name: "PrepNexo Pro Yearly",
+      price: "2999",
+      priceCurrency: "INR",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "2999",
+        priceCurrency: "INR",
+        billingDuration: "P1Y",
+      },
+    },
   ],
 };
 
@@ -174,6 +186,12 @@ export default function HomePage() {
                 <p className="text-2xl font-black">₹399</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Pro monthly
+                </p>
+              </div>
+              <div className="rounded-lg border bg-background/70 p-4 sm:col-span-3">
+                <p className="text-2xl font-black">₹2999/year</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Best value for serious prep with fair-usage AI interviews
                 </p>
               </div>
             </div>
