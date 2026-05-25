@@ -9,11 +9,11 @@ describe("GeminiService", () => {
     await expect(
       service.generateText({
         systemInstruction: "Test",
-        prompt: "Hello"
-      })
+        prompt: "Hello",
+      }),
     ).rejects.toMatchObject({
       statusCode: 503,
-      code: "GEMINI_NOT_CONFIGURED"
+      code: "AI_NOT_CONFIGURED",
     });
   });
 });

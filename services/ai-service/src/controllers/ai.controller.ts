@@ -9,6 +9,7 @@ async function streamResponse(res: Response, stream: AsyncIterable<string>) {
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders?.();
+  res.write("event: start\ndata: {}\n\n");
 
   try {
     for await (const text of stream) {

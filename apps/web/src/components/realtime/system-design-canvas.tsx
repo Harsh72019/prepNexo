@@ -87,6 +87,11 @@ const boardSize = {
   height: 980,
 };
 
+const blockSize = {
+  width: 144,
+  height: 76,
+};
+
 export function SystemDesignCanvas({
   roomId = "demo-system-design",
 }: {
@@ -356,6 +361,9 @@ export function SystemDesignCanvas({
   }
 
   async function requestCritique() {
+    const blockById = new Map(
+      (canvas?.blocks ?? []).map((block) => [block.id, block]),
+    );
     const blockNotes = (canvas?.blocks ?? [])
       .sort((a, b) => a.x - b.x)
       .map(
@@ -365,7 +373,11 @@ export function SystemDesignCanvas({
       .join("\n");
     const edgeNotes =
       (canvas?.connections ?? [])
-        .map((edge) => `${edge.from} -> ${edge.to}`)
+        .map((edge) => {
+          const from = blockById.get(edge.from);
+          const to = blockById.get(edge.to);
+          return `${from?.label ?? edge.from} (${from?.type ?? "unknown"}) -> ${to?.label ?? edge.to} (${to?.type ?? "unknown"})`;
+        })
         .join("\n") || "No connections defined.";
     const incidentNotes =
       incidents.length > 0 ? incidents.join("\n") : "No injected failures yet.";
@@ -377,7 +389,13 @@ export function SystemDesignCanvas({
           scenario:
             selectedScenario?.prompt ??
             "Design a scalable interview preparation platform.",
-          designNotes: `Blocks:\n${blockNotes}\n\nConnections:\n${edgeNotes}\n\nInjected incidents:\n${incidentNotes}`,
+          designNotes: [
+            `Canvas has ${canvas?.blocks.length ?? 0} blocks and ${canvas?.connections.length ?? 0} directed connections.`,
+            `Blocks:\n${blockNotes || "No blocks yet."}`,
+            `Connections:\n${edgeNotes}`,
+            `Injected incidents:\n${incidentNotes}`,
+            "Evaluate whether the canvas covers requirements, APIs, read/write flow, data ownership, caching, queues, reliability, observability, and bottlenecks. Be concise.",
+          ].join("\n\n"),
         },
         (token) => setFeedback((current) => `${current ?? ""}${token}`),
       );
@@ -424,22 +442,84 @@ export function SystemDesignCanvas({
   }
 
   function connectionPath(from: SystemDesignBlock, to: SystemDesignBlock) {
-    const blockWidth = 144;
-    const blockHeight = 76;
-    const start = {
-      x: from.x + (to.x >= from.x ? blockWidth : 0),
-      y: from.y + blockHeight / 2,
+    const fromCenter = {
+      x: from.x + blockSize.width / 2,
+      y: from.y + blockSize.height / 2,
     };
-    const end = {
-      x: to.x + (to.x >= from.x ? 0 : blockWidth),
-      y: to.y + blockHeight / 2,
+    const toCenter = {
+      x: to.x + blockSize.width / 2,
+      y: to.y + blockSize.height / 2,
     };
-    const horizontalGap = Math.abs(end.x - start.x);
-    const bendX =
-      horizontalGap > 120
-        ? start.x + (end.x - start.x) / 2
-        : start.x + (to.x >= from.x ? 72 : -72);
-    return `M ${start.x} ${start.y} C ${bendX} ${start.y}, ${bendX} ${end.y}, ${end.x} ${end.y}`;
+    const dx = toCenter.x - fromCenter.x;
+    const dy = toCenter.y - fromCenter.y;
+    const routeHorizontal = Math.abs(dx) > Math.abs(dy);
+    const start = routeHorizontal
+      ? {
+          x: from.x + (dx >= 0 ? blockSize.width : 0),
+          y: fromCenter.y,
+        }
+      : {
+          x: fromCenter.x,
+          y: from.y + (dy >= 0 ? blockSize.height : 0),
+        };
+    const end = routeHorizontal
+      ? {
+          x: to.x + (dx >= 0 ? 0 : blockSize.width),
+          y: toCenter.y,
+        }
+      : {
+          x: toCenter.x,
+          y: to.y + (dy >= 0 ? 0 : blockSize.height),
+        };
+
+    const radius = 18;
+    if (routeHorizontal) {
+      const midX = start.x + (end.x - start.x) / 2;
+      const firstTurn = {
+        x: midX,
+        y: start.y,
+      };
+      const secondTurn = {
+        x: midX,
+        y: end.y,
+      };
+      const yDirection = Math.sign(end.y - start.y) || 1;
+      const xDirection = Math.sign(end.x - start.x) || 1;
+      if (Math.abs(end.y - start.y) < radius * 2) {
+        return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
+      }
+      return [
+        `M ${start.x} ${start.y}`,
+        `L ${firstTurn.x - radius * xDirection} ${firstTurn.y}`,
+        `Q ${firstTurn.x} ${firstTurn.y} ${firstTurn.x} ${firstTurn.y + radius * yDirection}`,
+        `L ${secondTurn.x} ${secondTurn.y - radius * yDirection}`,
+        `Q ${secondTurn.x} ${secondTurn.y} ${secondTurn.x + radius * xDirection} ${secondTurn.y}`,
+        `L ${end.x} ${end.y}`,
+      ].join(" ");
+    }
+
+    const midY = start.y + (end.y - start.y) / 2;
+    const firstTurn = {
+      x: start.x,
+      y: midY,
+    };
+    const secondTurn = {
+      x: end.x,
+      y: midY,
+    };
+    const xDirection = Math.sign(end.x - start.x) || 1;
+    const yDirection = Math.sign(end.y - start.y) || 1;
+    if (Math.abs(end.x - start.x) < radius * 2) {
+      return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
+    }
+    return [
+      `M ${start.x} ${start.y}`,
+      `L ${firstTurn.x} ${firstTurn.y - radius * yDirection}`,
+      `Q ${firstTurn.x} ${firstTurn.y} ${firstTurn.x + radius * xDirection} ${firstTurn.y}`,
+      `L ${secondTurn.x - radius * xDirection} ${secondTurn.y}`,
+      `Q ${secondTurn.x} ${secondTurn.y} ${secondTurn.x} ${secondTurn.y + radius * yDirection}`,
+      `L ${end.x} ${end.y}`,
+    ].join(" ");
   }
 
   if (screen === "home") {

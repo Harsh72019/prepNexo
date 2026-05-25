@@ -6,6 +6,7 @@ type GenerateInput = {
   systemInstruction: string;
   prompt: string;
   temperature?: number;
+  maxOutputTokens?: number;
   cacheKey?: string;
   cacheableContext?: string;
 };
@@ -27,14 +28,14 @@ export class GeminiService {
     return new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
   }
 
-  private async cachedContentName(input: GenerateInput) {
+  private warmCache(input: GenerateInput) {
     if (!input.cacheKey || !input.cacheableContext) return undefined;
     if (this.unavailableCacheKeys.has(input.cacheKey)) return undefined;
     const existing = this.cacheNames.get(input.cacheKey);
     if (existing) return existing;
 
     const pending = this.cachePromises.get(input.cacheKey);
-    if (pending) return pending;
+    if (pending) return undefined;
 
     const promise = this.client()
       .caches.create({
@@ -62,7 +63,19 @@ export class GeminiService {
       });
 
     this.cachePromises.set(input.cacheKey, promise);
-    return promise;
+    void promise;
+    return undefined;
+  }
+
+  private generationConfig(input: GenerateInput, cachedContent?: string) {
+    return {
+      ...(cachedContent
+        ? { cachedContent }
+        : { systemInstruction: input.systemInstruction }),
+      temperature: input.temperature ?? 0.35,
+      maxOutputTokens: input.maxOutputTokens ?? 420,
+      thinkingConfig: { thinkingBudget: 0 },
+    };
   }
 
   private inlinePrompt(input: GenerateInput) {
@@ -72,32 +85,22 @@ export class GeminiService {
   }
 
   async generateText(input: GenerateInput) {
-    const cachedContent = await this.cachedContentName(input);
+    const cachedContent = this.warmCache(input);
     const response = await this.client().models.generateContent({
       model: env.GEMINI_MODEL,
       contents: cachedContent ? input.prompt : this.inlinePrompt(input),
-      config: {
-        ...(cachedContent
-          ? { cachedContent }
-          : { systemInstruction: input.systemInstruction }),
-        temperature: input.temperature ?? 0.35,
-      },
+      config: this.generationConfig(input, cachedContent),
     });
 
     return response.text ?? "";
   }
 
   async *streamText(input: GenerateInput) {
-    const cachedContent = await this.cachedContentName(input);
+    const cachedContent = this.warmCache(input);
     const stream = await this.client().models.generateContentStream({
       model: env.GEMINI_MODEL,
       contents: cachedContent ? input.prompt : this.inlinePrompt(input),
-      config: {
-        ...(cachedContent
-          ? { cachedContent }
-          : { systemInstruction: input.systemInstruction }),
-        temperature: input.temperature ?? 0.35,
-      },
+      config: this.generationConfig(input, cachedContent),
     });
 
     for await (const chunk of stream) {
