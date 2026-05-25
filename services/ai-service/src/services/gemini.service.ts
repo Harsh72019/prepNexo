@@ -7,6 +7,7 @@ type GenerateInput = {
   prompt: string;
   temperature?: number;
   maxOutputTokens?: number;
+  thinkingBudget?: number;
   cacheKey?: string;
   cacheableContext?: string;
 };
@@ -74,7 +75,7 @@ export class GeminiService {
         : { systemInstruction: input.systemInstruction }),
       temperature: input.temperature ?? 0.35,
       maxOutputTokens: input.maxOutputTokens ?? 420,
-      thinkingConfig: { thinkingBudget: 0 },
+      thinkingConfig: { thinkingBudget: input.thinkingBudget ?? 0 },
     };
   }
 

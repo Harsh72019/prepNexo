@@ -77,7 +77,7 @@ const systemDesignContext = [
   "- Distinguish MVP choices from scale-hardening choices.",
   "- Ask for simplification if the candidate over-engineers.",
   "OUTPUT: Score signal, strongest point, biggest missing piece, concrete risk, and next two design improvements.",
-  "RULES: Be practical and interviewer-like. Avoid generic buzzwords. Keep under 160 words. Use the variables that follow.",
+  "RULES: Be practical and interviewer-like. Avoid generic buzzwords. Keep under 220 words. Use the variables that follow.",
   "VARIABLES ARE APPENDED AFTER THIS CACHED CONTEXT.",
 ].join("\n");
 
@@ -138,7 +138,8 @@ export class InterviewAiService {
       cacheableContext: systemDesignContext,
       prompt: `VARIABLES:\nScenario:\n${input.scenario}\n\nCandidate design notes:\n${input.designNotes}`,
       temperature: 0.3,
-      maxOutputTokens: 340,
+      maxOutputTokens: 520,
+      thinkingBudget: 256,
     };
   }
 
