@@ -1,11 +1,27 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BrainCircuit, Code2, Network, Sparkles, Trophy, Zap } from "lucide-react";
+import {
+  BrainCircuit,
+  Code2,
+  Network,
+  Sparkles,
+  Trophy,
+  Zap,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
-export function AuthCard({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+export function AuthCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}) {
   return (
     <main className="grid min-h-screen overflow-hidden bg-background lg:grid-cols-[minmax(0,1.08fr)_minmax(420px,0.92fr)]">
       <section className="relative hidden min-h-screen overflow-hidden border-r bg-[radial-gradient(circle_at_28%_22%,hsl(var(--primary)/0.18),transparent_28%),linear-gradient(145deg,hsl(var(--card)),hsl(var(--secondary)/0.7)_52%,hsl(var(--background)))] px-10 py-10 lg:flex lg:flex-col lg:justify-between">
@@ -24,9 +40,18 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
         <div className="relative z-10">
           <div className="inline-flex h-20 items-center rounded-lg border bg-background/78 px-3 shadow-[0_18px_50px_hsl(var(--primary)/0.18)] backdrop-blur-xl">
             <span className="relative size-14 overflow-hidden rounded-md">
-              <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="56px" className="object-contain" priority />
+              <Image
+                src="/brand/logo.png"
+                alt="PrepNexo logo"
+                fill
+                sizes="56px"
+                className="object-contain"
+                priority
+              />
             </span>
-            <span className="ml-2 text-lg font-black tracking-normal">PrepNexo</span>
+            <span className="ml-2 text-lg font-black tracking-normal">
+              PrepNexo
+            </span>
           </div>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -42,7 +67,8 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
               Learn faster. Compete harder. Walk in ready.
             </h1>
             <p className="mt-5 max-w-lg text-lg leading-8 text-muted-foreground">
-              A pressure-built space for coding rounds, DSA battles, system design, and AI feedback that turns prep into momentum.
+              A pressure-built space for coding rounds, DSA battles, system
+              design, and AI feedback that turns prep into momentum.
             </p>
           </motion.div>
         </div>
@@ -57,7 +83,11 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
             <motion.div
               className="absolute left-[205px] top-[86px] grid size-32 place-items-center rounded-lg border border-primary/45 bg-background/88 shadow-[0_28px_90px_hsl(var(--primary)/0.3)] backdrop-blur-xl [transform:translateZ(96px)]"
               animate={{ y: [-8, 8, -8], rotateY: [0, 12, 0] }}
-              transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
+              transition={{
+                duration: 5.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
             >
               <div className="grid size-20 place-items-center rounded-lg bg-primary text-primary-foreground shadow-[0_16px_40px_hsl(var(--primary)/0.32)]">
                 <BrainCircuit className="size-9" />
@@ -65,10 +95,34 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
             </motion.div>
 
             {[
-              { icon: Code2, label: "Live round", value: "45:00", className: "left-8 top-7 [transform:translateZ(52px)_rotateY(-14deg)]" },
-              { icon: Trophy, label: "Arena rank", value: "#18", className: "right-10 top-4 [transform:translateZ(64px)_rotateY(16deg)]" },
-              { icon: Network, label: "Design", value: "Scale", className: "left-20 bottom-12 [transform:translateZ(44px)_rotateY(-18deg)]" },
-              { icon: Zap, label: "Readiness", value: "82%", className: "right-16 bottom-16 [transform:translateZ(76px)_rotateY(12deg)]" }
+              {
+                icon: Code2,
+                label: "Live round",
+                value: "45:00",
+                className:
+                  "left-8 top-7 [transform:translateZ(52px)_rotateY(-14deg)]",
+              },
+              {
+                icon: Trophy,
+                label: "Arena rank",
+                value: "#18",
+                className:
+                  "right-10 top-4 [transform:translateZ(64px)_rotateY(16deg)]",
+              },
+              {
+                icon: Network,
+                label: "Design",
+                value: "Scale",
+                className:
+                  "left-20 bottom-12 [transform:translateZ(44px)_rotateY(-18deg)]",
+              },
+              {
+                icon: Zap,
+                label: "Readiness",
+                value: "82%",
+                className:
+                  "right-16 bottom-16 [transform:translateZ(76px)_rotateY(12deg)]",
+              },
             ].map((item, index) => {
               const Icon = item.icon;
               return (
@@ -76,11 +130,19 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
                   key={item.label}
                   className={`absolute w-36 rounded-lg border bg-background/86 p-4 shadow-[0_18px_60px_rgb(0_0_0/0.18)] backdrop-blur-xl ${item.className}`}
                   animate={{ y: [0, index % 2 === 0 ? -14 : 14, 0] }}
-                  transition={{ duration: 4.8 + index * 0.4, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 4.8 + index * 0.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 >
                   <Icon className="size-5 text-primary" />
-                  <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">{item.label}</p>
-                  <p className="mt-1 text-2xl font-black tracking-normal">{item.value}</p>
+                  <p className="mt-3 text-xs font-semibold uppercase text-muted-foreground">
+                    {item.label}
+                  </p>
+                  <p className="mt-1 text-2xl font-black tracking-normal">
+                    {item.value}
+                  </p>
                 </motion.div>
               );
             })}
@@ -88,9 +150,16 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
         </div>
 
         <div className="relative z-10 grid grid-cols-3 gap-3 text-sm">
-          {["Realtime coding", "AI interviewer", "System battles"].map((item) => (
-            <div key={item} className="rounded-lg border bg-background/72 p-4 font-semibold text-muted-foreground shadow-sm backdrop-blur-xl">{item}</div>
-          ))}
+          {["Realtime coding", "AI interviewer", "System battles"].map(
+            (item) => (
+              <div
+                key={item}
+                className="rounded-lg border bg-background/72 p-4 font-semibold text-muted-foreground shadow-sm backdrop-blur-xl"
+              >
+                {item}
+              </div>
+            ),
+          )}
         </div>
       </section>
       <section className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
@@ -102,13 +171,36 @@ export function AuthCard({ title, subtitle, children }: { title: string; subtitl
         >
           <div className="mb-6 flex items-center gap-3 lg:hidden">
             <span className="relative size-14 overflow-hidden rounded-lg border bg-background p-1">
-              <Image src="/brand/logo.png" alt="PrepNexo logo" fill sizes="56px" className="object-contain" priority />
+              <Image
+                src="/brand/logo.png"
+                alt="PrepNexo logo"
+                fill
+                sizes="56px"
+                className="object-contain"
+                priority
+              />
             </span>
             <span className="text-lg font-black tracking-normal">PrepNexo</span>
           </div>
           <h2 className="text-2xl font-semibold tracking-normal">{title}</h2>
           <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>
+          <p className="mt-3 rounded-md border bg-background/70 p-3 text-xs leading-5 text-muted-foreground">
+            PrepNexo uses your account only to save interview practice, question
+            progress, billing status, and dashboard analytics. We never ask for
+            bank passwords, OTPs, or employer credentials.
+          </p>
           <div className="mt-6">{children}</div>
+          <div className="mt-6 flex flex-wrap gap-3 text-xs text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              Terms
+            </Link>
+            <Link href="/contact" className="hover:text-foreground">
+              Contact
+            </Link>
+          </div>
         </motion.div>
       </section>
     </main>

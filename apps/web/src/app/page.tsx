@@ -290,6 +290,17 @@ export default function HomePage() {
           PrepNexo - AI interview prep, DSA arena, system design practice, and
           adaptive analytics.
         </p>
+        <div className="mt-3 flex justify-center gap-4">
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-foreground">
+            Terms
+          </Link>
+          <Link href="/contact" className="hover:text-foreground">
+            Contact
+          </Link>
+        </div>
       </footer>
     </main>
   );
