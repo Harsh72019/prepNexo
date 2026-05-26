@@ -4424,6 +4424,244 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
     ],
     constraints: ["Operations are in non-decreasing time per key"],
     skillKeys: ["dsa.design", "dsa.binary_search"]
+  },
+  {
+    slug: "sliding-rate-limiter-rejections",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Sliding Rate Limiter Rejections",
+    description: "The first two numbers are limit and windowSeconds. Remaining values are request timestamps in non-decreasing order. Accept a request only if fewer than limit accepted requests exist in the inclusive window [time - windowSeconds + 1, time]. Return the number of rejected requests.",
+    acceptanceText: "<p><strong>Expected:</strong> Queue accepted timestamps only. Expire old accepted timestamps before deciding each new request.</p>",
+    testCases: [
+      { input: [2, 10, 1, 2, 3, 12], expected: 1 },
+      { input: [1, 5, 1, 1, 6], expected: 1 },
+      { input: [3, 2], expected: 0 }
+    ],
+    constraints: ["Timestamps are non-decreasing", "Only accepted requests count against the limit"],
+    skillKeys: ["dsa.sliding_window", "dsa.queue"]
+  },
+  {
+    slug: "ttl-cache-origin-hits",
+    topic: "Design",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "TTL Cache Origin Hits",
+    description: "The first number is ttl. Remaining values are request pairs time,key. A cache entry is valid through time insertedAt + ttl - 1. Return how many requests hit origin because the key was absent or expired.",
+    acceptanceText: "<p><strong>Expected:</strong> Hash map key to expiry time. Update expiry only on origin hits, not cache hits.</p>",
+    testCases: [
+      { input: [5, 1, 10, 2, 10, 6, 10, 7, 20], expected: 3 },
+      { input: [3, 1, 1, 3, 1, 4, 1], expected: 2 },
+      { input: [10], expected: 0 }
+    ],
+    constraints: ["Requests are encoded as time,key pairs", "Ignore incomplete trailing value"],
+    skillKeys: ["dsa.design", "dsa.hashing"]
+  },
+  {
+    slug: "dependency-install-waves",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Dependency Install Waves",
+    description: "The first number is n packages. Remaining values are directed edges prereq,package. In one wave you can install all currently unblocked packages. Return the minimum number of waves needed, or -1 if dependencies contain a cycle.",
+    acceptanceText: "<p><strong>Expected:</strong> Kahn topological sort level by level. A cycle exists if processed count is less than n.</p>",
+    testCases: [
+      { input: [4, 0, 1, 0, 2, 1, 3, 2, 3], expected: 3 },
+      { input: [3, 0, 1, 1, 2, 2, 0], expected: -1 },
+      { input: [2], expected: 1 }
+    ],
+    constraints: ["Nodes are 0-indexed packages"],
+    skillKeys: ["dsa.graphs", "dsa.topological_sort"]
+  },
+  {
+    slug: "fraud-ring-largest-scc",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Largest Fraud Ring SCC",
+    description: "The first number is n accounts. Remaining values are directed transfer edges u,v. Return the size of the largest strongly connected component.",
+    acceptanceText: "<p><strong>Expected:</strong> Tarjan SCC or Kosaraju with reverse graph. Single isolated nodes count as SCCs of size 1.</p>",
+    testCases: [
+      { input: [5, 0, 1, 1, 2, 2, 0, 3, 4], expected: 3 },
+      { input: [4, 0, 1, 1, 2, 2, 3], expected: 1 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Directed graph", "Ignore incomplete trailing edge"],
+    skillKeys: ["dsa.graphs", "dsa.dfs"]
+  },
+  {
+    slug: "skyline-key-points-count",
+    topic: "Heaps",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Skyline Key Points Count",
+    description: "Buildings are encoded as left,right,height triples. Return the number of key points in the skyline outline.",
+    acceptanceText: "<p><strong>Expected:</strong> Sweep line events with a max-heap or multiset of active heights. Count changes in current max height.</p>",
+    testCases: [
+      { input: [2, 9, 10, 3, 7, 15, 5, 12, 12, 15, 20, 10, 19, 24, 8], expected: 7 },
+      { input: [0, 2, 3, 2, 5, 3], expected: 2 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Buildings are half-open intervals [left,right)", "Ignore incomplete trailing triple"],
+    skillKeys: ["dsa.heaps", "dsa.sweep_line"]
+  },
+  {
+    slug: "idempotency-key-window",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Stripe",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Idempotency Key Window",
+    description: "The first number is windowSeconds. Remaining values are request pairs time,key. Return how many requests are duplicates of the same key within the inclusive window [time-windowSeconds+1,time].",
+    acceptanceText: "<p><strong>Expected:</strong> Track recent timestamps per key with queues, expiring entries outside the window before checking duplicate status.</p>",
+    testCases: [
+      { input: [10, 1, 7, 5, 7, 12, 7, 13, 8], expected: 1 },
+      { input: [5, 1, 1, 5, 1, 6, 1], expected: 1 },
+      { input: [3], expected: 0 }
+    ],
+    constraints: ["Requests are non-decreasing by time"],
+    skillKeys: ["dsa.sliding_window", "dsa.hashing"]
+  },
+  {
+    slug: "adaptive-threshold-alerts",
+    topic: "Sliding Window",
+    difficulty: "HARD",
+    company: "Datadog",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Adaptive Threshold Alert Count",
+    description: "The first number is k. Remaining values are metric samples. Count subarrays where max(sample) - min(sample) is at most k.",
+    acceptanceText: "<p><strong>Expected:</strong> Sliding window with two monotonic deques tracking current max and min.</p>",
+    testCases: [
+      { input: [2, 1, 3, 2], expected: 6 },
+      { input: [1, 1, 5, 2, 3], expected: 6 },
+      { input: [0, 4, 4, 4], expected: 6 }
+    ],
+    constraints: ["Return count of valid contiguous subarrays"],
+    skillKeys: ["dsa.sliding_window", "dsa.monotonic_queue"]
+  },
+  {
+    slug: "consensus-log-commit-index",
+    topic: "Binary Search",
+    difficulty: "HARD",
+    company: "CockroachDB",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Consensus Log Commit Index",
+    description: "The first number is quorum. Remaining values are match indexes reported by replicas. Return the highest log index replicated on at least quorum replicas.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort descending and read the quorum-th largest value, or binary search an index with count >= quorum.</p>",
+    testCases: [
+      { input: [3, 10, 8, 8, 7, 6], expected: 8 },
+      { input: [2, 1, 5, 3], expected: 3 },
+      { input: [4, 1, 2], expected: 0 }
+    ],
+    constraints: ["Return 0 if fewer than quorum replicas exist"],
+    skillKeys: ["dsa.binary_search", "dsa.sorting"]
+  },
+  {
+    slug: "hot-shard-rebalance-cost",
+    topic: "Greedy",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Hot Shard Rebalance Cost",
+    description: "Each value is load on a shard. In one move, shift one unit of load from any shard to any other shard. Return the minimum moves needed to make all shard loads equal, or -1 if impossible.",
+    acceptanceText: "<p><strong>Expected:</strong> Total load must divide by shard count. Sum positive surplus over target gives minimum moves.</p>",
+    testCases: [
+      { input: [1, 0, 5], expected: 4 },
+      { input: [2, 2, 2], expected: 0 },
+      { input: [1, 2, 4], expected: -1 }
+    ],
+    constraints: ["Loads are non-negative"],
+    skillKeys: ["dsa.greedy", "dsa.arrays"]
+  },
+  {
+    slug: "compressed-event-stream-length",
+    topic: "Stack",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Compressed Event Stream Length",
+    description: "Values are event IDs. Repeatedly delete any contiguous run of exactly 3 equal events; deletions may cause new runs to form. Return the final stream length.",
+    acceptanceText: "<p><strong>Expected:</strong> Stack of value,count pairs. When count reaches 3, pop the run and continue merging with previous runs.</p>",
+    testCases: [
+      { input: [1, 1, 1, 2, 2, 2], expected: 0 },
+      { input: [1, 1, 2, 2, 2, 1], expected: 0 },
+      { input: [3, 3], expected: 2 }
+    ],
+    constraints: ["Only runs of exactly 3 trigger removal when they form"],
+    skillKeys: ["dsa.stack"]
+  },
+  {
+    slug: "quorum-majority-after-updates",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "CockroachDB",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Quorum Majority After Updates",
+    description: "The first number is n replicas. The next n values are replica states. Remaining operations are index,newState. Apply updates and return how many times after an update some state has strict majority.",
+    acceptanceText: "<p><strong>Expected:</strong> Maintain frequency counts while updating old and new states. Strict majority means count > n / 2.</p>",
+    testCases: [
+      { input: [5, 1, 1, 2, 2, 2, 0, 2, 3, 1], expected: 2 },
+      { input: [3, 1, 2, 3, 0, 1], expected: 0 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Indices are 0-based", "Ignore incomplete trailing update"],
+    skillKeys: ["dsa.arrays", "dsa.hashing"]
+  },
+  {
+    slug: "contention-peak-sweep",
+    topic: "Sweep Line",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Resource Contention Peak Sweep",
+    description: "Reservations are encoded as start,end pairs using half-open intervals [start,end). Return the maximum number of simultaneously active reservations.",
+    acceptanceText: "<p><strong>Expected:</strong> Sweep line start/end events. For equal time, process ends before starts for half-open intervals.</p>",
+    testCases: [
+      { input: [1, 4, 2, 5, 5, 7], expected: 2 },
+      { input: [1, 2, 2, 3, 3, 4], expected: 1 },
+      { input: [1, 10, 2, 3, 4, 9], expected: 3 }
+    ],
+    constraints: ["Intervals are half-open", "Ignore incomplete trailing endpoint"],
+    skillKeys: ["dsa.sweep_line", "dsa.sorting"]
+  },
+  {
+    slug: "audit-log-last-write-wins",
+    topic: "Hashing",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Audit Log Last Write Wins",
+    description: "Operations are encoded as op,key where op=1 activates a key and op=2 deactivates a key. Apply the log in order and return the number of active keys at the end.",
+    acceptanceText: "<p><strong>Expected:</strong> Hash set for active keys. Inserts and deletes should be idempotent.</p>",
+    testCases: [
+      { input: [1, 5, 1, 6, 2, 5, 1, 5], expected: 2 },
+      { input: [2, 1, 1, 1, 2, 1], expected: 0 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Ignore incomplete trailing operation"],
+    skillKeys: ["dsa.hashing", "dsa.design"]
+  },
+  {
+    slug: "rank-compression-gap-sum",
+    topic: "Sorting",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Rank Compression Gap Sum",
+    description: "Compress values into ranks starting at 1 after sorting distinct values. Return the sum of absolute differences between original values' ranks and their 1-based positions.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort distinct values to build value-to-rank mapping, then scan original order.</p>",
+    testCases: [
+      { input: [40, 10, 20, 30], expected: 6 },
+      { input: [100, 100, 100], expected: 3 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Duplicate values share the same rank"],
+    skillKeys: ["dsa.sorting", "dsa.hashing"]
   }
 ];
 
