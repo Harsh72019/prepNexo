@@ -806,44 +806,805 @@ function difficultyFor(template: DsaTemplate, index: number): Difficulty {
   return index % 7 === 0 ? "MEDIUM" : "EASY";
 }
 
-function buildDsaQuestions() {
-  const questions: QuestionSeed[] = [];
-  for (const template of templates) {
-    for (let index = 0; index < 20; index += 1) {
-      const context = contexts[index % contexts.length];
-      const company = companies[(index + template.key.length) % companies.length];
-      const difficulty = difficultyFor(template, index);
-      const heading = `${template.title}: ${context.replace(/\b\w/g, (letter) => letter.toUpperCase())}`;
-      const description = [
-        `You are analyzing ${context} for a ${company.name}-style interview screen.`,
-        template.prompt({ index, context, company: company.name, companyTags: company.tags, difficulty }),
-        "",
-        "Implement solve(nums). Return one integer. The runner passes only this number array, so any target/window/n metadata is encoded in nums as described."
-      ].join("\n");
-      questions.push({
-        slug: slugify(`prepnexo-dsa-${template.key}-${index + 1}`),
-        type: "DSA",
-        topic: template.topic,
-        difficulty,
-        company: company.name,
-        companyTags: company.tags,
-        heading,
-        description,
-        acceptanceText: `<p><strong>Expected signal:</strong> ${template.acceptance}</p><p>Candidate should state time complexity, edge cases, and why the chosen data structure fits.</p>`,
-        starterCode: starter(heading),
-        testCases: template.cases(index + template.key.length),
-        examples: [],
-        constraints: [
-          "0 <= nums.length <= 200000 for the intended solution",
-          "Values fit inside signed 32-bit integer range",
-          "Return exactly one integer"
-        ],
-        skillKeys: template.skillKeys,
-        status: "ACTIVE"
-      });
-    }
+type CuratedDsaProblem = {
+  slug: string;
+  topic: string;
+  difficulty: Difficulty;
+  company: string;
+  companyTags: CompanyTag[];
+  heading: string;
+  description: string;
+  acceptanceText: string;
+  testCases: TestCase[];
+  constraints: string[];
+  skillKeys: string[];
+};
+
+const curatedDsaProblems: CuratedDsaProblem[] = [
+  {
+    slug: "two-sum-frequency-ledger",
+    topic: "Hashing",
+    difficulty: "EASY",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Two Sum Frequency Ledger",
+    description: "The first number is target. Remaining values are transaction amounts. Return the number of unique index pairs whose sum equals target. Duplicates are real records, so count valid index pairs, not just distinct values.",
+    acceptanceText: "<p><strong>Expected:</strong> Use a frequency map while scanning. Explain duplicate handling and why the same index is never reused.</p>",
+    testCases: [
+      { input: [9, 2, 7, 11, 15], expected: 1 },
+      { input: [6, 3, 3, 3, 1, 5], expected: 3 },
+      { input: [10, 1, 9, 5, 5, 3, 7], expected: 3 }
+    ],
+    constraints: ["1 <= nums.length <= 200000", "First value is target", "Return pair count"],
+    skillKeys: ["dsa.hashing", "dsa.arrays"]
+  },
+  {
+    slug: "longest-non-repeating-signal-run",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Non-Repeating Signal Run",
+    description: "Values represent event IDs. Return the length of the longest contiguous segment with no repeated event ID.",
+    acceptanceText: "<p><strong>Expected:</strong> Sliding window with last-seen positions or a set. Move the left pointer past duplicates without restarting the scan.</p>",
+    testCases: [
+      { input: [1, 2, 3, 1, 2, 3, 4], expected: 4 },
+      { input: [5, 5, 5], expected: 1 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["0 <= nums.length <= 200000", "Values can repeat heavily"],
+    skillKeys: ["dsa.sliding_window", "dsa.hashing"]
+  },
+  {
+    slug: "minimum-window-threshold",
+    topic: "Two Pointers",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Window Threshold",
+    description: "The first number is a target. Remaining positive values are request weights. Return the smallest contiguous window length whose sum is at least target, or 0 if no such window exists.",
+    acceptanceText: "<p><strong>Expected:</strong> Expand right, shrink left while the target is satisfied, and keep the best length.</p>",
+    testCases: [
+      { input: [7, 2, 3, 1, 2, 4, 3], expected: 2 },
+      { input: [15, 1, 2, 3, 4], expected: 0 },
+      { input: [4, 4], expected: 1 }
+    ],
+    constraints: ["All values after target are positive", "Return 0 if impossible"],
+    skillKeys: ["dsa.two_pointers", "dsa.sliding_window"]
+  },
+  {
+    slug: "maximum-subarray-drawdown",
+    topic: "Dynamic Programming",
+    difficulty: "EASY",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximum Subarray Drawdown",
+    description: "Each value is a daily score delta. Return the maximum sum of a non-empty contiguous segment.",
+    acceptanceText: "<p><strong>Expected:</strong> Kadane's algorithm. Handle all-negative arrays by returning the least negative value.</p>",
+    testCases: [
+      { input: [-2, 1, -3, 4, -1, 2, 1, -5, 4], expected: 6 },
+      { input: [-5, -1, -9], expected: -1 },
+      { input: [4, -2, 7, -10, 5], expected: 9 }
+    ],
+    constraints: ["1 <= nums.length <= 200000"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.arrays"]
+  },
+  {
+    slug: "product-except-self-sum",
+    topic: "Prefix Sums",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Product Except Self Sum",
+    description: "For every index, compute the product of all numbers except nums[i]. Return the sum of those products. Do not use division.",
+    acceptanceText: "<p><strong>Expected:</strong> Prefix and suffix products in two passes. Zeros should work naturally.</p>",
+    testCases: [
+      { input: [1, 2, 3, 4], expected: 50 },
+      { input: [0, 2, 3], expected: 6 },
+      { input: [5], expected: 1 }
+    ],
+    constraints: ["Do not use division", "Return the sum of product-except-self values"],
+    skillKeys: ["dsa.prefix_sums", "dsa.arrays"]
+  },
+  {
+    slug: "daily-temperatures-wait-sum",
+    topic: "Monotonic Stack",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Daily Temperatures Wait Sum",
+    description: "Each number is a temperature. For every day, compute how many days until a warmer temperature appears. Return the sum of all wait times.",
+    acceptanceText: "<p><strong>Expected:</strong> Use a monotonic decreasing stack of indices and resolve waits when a warmer value arrives.</p>",
+    testCases: [
+      { input: [73, 74, 75, 71, 69, 72, 76, 73], expected: 10 },
+      { input: [30, 40, 50, 60], expected: 3 },
+      { input: [60, 50, 40], expected: 0 }
+    ],
+    constraints: ["0 <= nums.length <= 200000"],
+    skillKeys: ["dsa.monotonic_stack", "dsa.stack"]
+  },
+  {
+    slug: "largest-histogram-rectangle",
+    topic: "Monotonic Stack",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Largest Histogram Rectangle",
+    description: "Each value is a histogram bar height. Return the largest rectangle area that can be formed using contiguous bars.",
+    acceptanceText: "<p><strong>Expected:</strong> Monotonic increasing stack with a sentinel. Explain how width is calculated after popping.</p>",
+    testCases: [
+      { input: [2, 1, 5, 6, 2, 3], expected: 10 },
+      { input: [2, 4], expected: 4 },
+      { input: [1, 1, 1, 1], expected: 4 }
+    ],
+    constraints: ["0 <= height <= 100000", "Use O(n) stack approach for full credit"],
+    skillKeys: ["dsa.monotonic_stack", "dsa.stack"]
+  },
+  {
+    slug: "rotated-array-search-index",
+    topic: "Binary Search",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Rotated Array Search Index",
+    description: "The first number is target. Remaining values are a strictly increasing array rotated at an unknown pivot. Return the index of target in the remaining values, or -1 if absent.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search by identifying which half is sorted on every step.</p>",
+    testCases: [
+      { input: [0, 4, 5, 6, 7, 0, 1, 2], expected: 4 },
+      { input: [3, 4, 5, 6, 7, 0, 1, 2], expected: -1 },
+      { input: [5, 5], expected: 0 }
+    ],
+    constraints: ["Remaining values are unique", "Returned index is relative to the remaining array"],
+    skillKeys: ["dsa.binary_search", "dsa.arrays"]
+  },
+  {
+    slug: "minimum-shipping-capacity",
+    topic: "Binary Search",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Shipping Capacity",
+    description: "The first number is days. Remaining positive numbers are package weights in order. Return the minimum ship capacity needed to deliver all packages within days.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search over answer space and greedily count required days for a candidate capacity.</p>",
+    testCases: [
+      { input: [5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], expected: 15 },
+      { input: [3, 3, 2, 2, 4, 1, 4], expected: 6 },
+      { input: [1, 3, 2, 2], expected: 7 }
+    ],
+    constraints: ["Weights must remain in original order"],
+    skillKeys: ["dsa.binary_search", "dsa.greedy"]
+  },
+  {
+    slug: "koko-minimum-eating-speed",
+    topic: "Binary Search",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Processing Speed",
+    description: "The first number is h hours. Remaining positive values are job sizes. Each hour you can process up to speed units from one job. Return the minimum integer speed needed to finish all jobs in h hours.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search speed and use ceiling division to calculate total hours.</p>",
+    testCases: [
+      { input: [8, 3, 6, 7, 11], expected: 4 },
+      { input: [5, 30, 11, 23, 4, 20], expected: 30 },
+      { input: [6, 30, 11, 23, 4, 20], expected: 23 }
+    ],
+    constraints: ["All job sizes are positive"],
+    skillKeys: ["dsa.binary_search"]
+  },
+  {
+    slug: "merge-intervals-total-coverage",
+    topic: "Intervals",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Merge Intervals Total Coverage",
+    description: "Values are encoded as start,end pairs. Merge overlapping intervals and return the total covered length. Ignore an incomplete trailing value.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort by start, merge with the last active interval, and sum merged ranges.</p>",
+    testCases: [
+      { input: [1, 3, 2, 6, 8, 10, 15, 18], expected: 10 },
+      { input: [1, 4, 4, 5], expected: 4 },
+      { input: [5], expected: 0 }
+    ],
+    constraints: ["Intervals are half-open for length: end - start", "Normalize pairs where start > end"],
+    skillKeys: ["dsa.intervals", "dsa.sorting"]
+  },
+  {
+    slug: "meeting-rooms-required",
+    topic: "Intervals",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Meeting Rooms Required",
+    description: "Values are encoded as start,end pairs. Return the minimum number of rooms needed so no overlapping meetings share a room.",
+    acceptanceText: "<p><strong>Expected:</strong> Sweep sorted start/end events or use a min-heap of end times.</p>",
+    testCases: [
+      { input: [0, 30, 5, 10, 15, 20], expected: 2 },
+      { input: [7, 10, 2, 4], expected: 1 },
+      { input: [1, 5, 2, 6, 3, 7], expected: 3 }
+    ],
+    constraints: ["Ignore incomplete trailing endpoint"],
+    skillKeys: ["dsa.intervals", "dsa.heaps"]
+  },
+  {
+    slug: "top-k-frequency-score",
+    topic: "Heaps",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Top K Frequency Score",
+    description: "The first number is k. Remaining values are item IDs. Return the sum of the k highest frequencies.",
+    acceptanceText: "<p><strong>Expected:</strong> Count with a map, then use a heap or bucket counts. Handle k larger than distinct count.</p>",
+    testCases: [
+      { input: [2, 1, 1, 1, 2, 2, 3], expected: 5 },
+      { input: [3, 4, 4, 5], expected: 2 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["First value is k", "Return sum of frequencies, not values"],
+    skillKeys: ["dsa.heaps", "dsa.hashing"]
+  },
+  {
+    slug: "median-stream-checkpoint",
+    topic: "Heaps",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Median Stream Checkpoint",
+    description: "Numbers arrive in order. After each prefix, compute the floor of the median. Return the sum of all prefix medians.",
+    acceptanceText: "<p><strong>Expected:</strong> Maintain two heaps, rebalance after insertion, and read the lower median from the max-heap.</p>",
+    testCases: [
+      { input: [5, 15, 1, 3], expected: 18 },
+      { input: [2, 4, 6], expected: 8 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Return sum of floor medians across prefixes"],
+    skillKeys: ["dsa.heaps"]
+  },
+  {
+    slug: "course-schedule-feasibility",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Course Schedule Feasibility",
+    description: "The first number is n. Remaining values are directed prerequisite edges encoded as course,prerequisite pairs. Return 1 if all courses can be finished, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Detect cycles with Kahn's topological sort or DFS colors.</p>",
+    testCases: [
+      { input: [2, 1, 0], expected: 1 },
+      { input: [2, 1, 0, 0, 1], expected: 0 },
+      { input: [4, 1, 0, 2, 1, 3, 2], expected: 1 }
+    ],
+    constraints: ["Nodes are 0..n-1", "Ignore incomplete trailing edge"],
+    skillKeys: ["dsa.graphs", "dsa.topological_sort"]
+  },
+  {
+    slug: "number-of-islands-flat-grid",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Number of Islands Flat Grid",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened binary grid. Return the number of 4-direction connected islands of 1s.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS/BFS over flattened coordinates. Carefully convert index to row/col.</p>",
+    testCases: [
+      { input: [3, 4, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1], expected: 3 },
+      { input: [2, 2, 1, 1, 1, 1], expected: 1 },
+      { input: [2, 3, 0, 0, 0, 0, 0, 0], expected: 0 }
+    ],
+    constraints: ["Grid length is rows * cols", "Use 4-direction connectivity"],
+    skillKeys: ["dsa.graphs", "dsa.bfs"]
+  },
+  {
+    slug: "shortest-path-binary-maze",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Shortest Path Binary Maze",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened grid where 0 is open and 1 is blocked. Return the shortest path length from top-left to bottom-right using 4-direction moves, or -1.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS from the source with distance levels and blocked/source edge checks.</p>",
+    testCases: [
+      { input: [3, 3, 0, 0, 0, 1, 1, 0, 0, 0, 0], expected: 5 },
+      { input: [2, 2, 0, 1, 1, 0], expected: -1 },
+      { input: [1, 1, 0], expected: 1 }
+    ],
+    constraints: ["Return number of cells on the path"],
+    skillKeys: ["dsa.graphs", "dsa.bfs"]
+  },
+  {
+    slug: "network-delay-time",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Network Delay Time",
+    description: "Input is encoded as n, source, then directed weighted edges u,v,w. Return the time for all nodes to receive the signal, or -1 if unreachable.",
+    acceptanceText: "<p><strong>Expected:</strong> Dijkstra with adjacency list and min-heap. Explain why plain BFS is incorrect for weighted edges.</p>",
+    testCases: [
+      { input: [4, 2, 2, 1, 1, 2, 3, 1, 3, 4, 1], expected: 2 },
+      { input: [2, 1, 1, 2, 5], expected: 5 },
+      { input: [2, 2, 1, 2, 5], expected: -1 }
+    ],
+    constraints: ["Nodes are 1-indexed", "Edges are triples after n and source"],
+    skillKeys: ["dsa.graphs", "dsa.shortest_path", "dsa.heaps"]
+  },
+  {
+    slug: "redundant-connection-edge",
+    topic: "Union Find",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Redundant Connection Edge",
+    description: "The first number is n. Remaining values are undirected edges encoded as u,v pairs. Return the 1-based position of the first edge that creates a cycle, or 0 if none.",
+    acceptanceText: "<p><strong>Expected:</strong> Union-find with path compression. Return edge order, not node ID.</p>",
+    testCases: [
+      { input: [3, 1, 2, 1, 3, 2, 3], expected: 3 },
+      { input: [4, 1, 2, 2, 3, 3, 4], expected: 0 },
+      { input: [5, 1, 2, 2, 3, 3, 1], expected: 3 }
+    ],
+    constraints: ["Nodes are 1..n"],
+    skillKeys: ["dsa.union_find", "dsa.graphs"]
+  },
+  {
+    slug: "tree-diameter-flat-edges",
+    topic: "Trees",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Tree Diameter From Edges",
+    description: "The first number is n. Remaining values are undirected tree edges encoded as u,v pairs using 0-indexed nodes. Return the tree diameter in number of edges.",
+    acceptanceText: "<p><strong>Expected:</strong> Two BFS/DFS passes: from any node to farthest A, then from A to farthest B.</p>",
+    testCases: [
+      { input: [5, 0, 1, 1, 2, 1, 3, 3, 4], expected: 3 },
+      { input: [1], expected: 0 },
+      { input: [4, 0, 1, 1, 2, 2, 3], expected: 3 }
+    ],
+    constraints: ["Input is a valid tree unless edges are missing"],
+    skillKeys: ["dsa.trees", "dsa.graphs"]
+  },
+  {
+    slug: "lowest-common-ancestor-bst",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Lowest Common Ancestor in BST",
+    description: "The first two numbers are p and q. Remaining values are a BST inserted in order. Build the BST and return the value of the lowest common ancestor of p and q.",
+    acceptanceText: "<p><strong>Expected:</strong> Use BST ordering to move left/right until p and q split around the current node.</p>",
+    testCases: [
+      { input: [2, 8, 6, 2, 8, 0, 4, 7, 9, 3, 5], expected: 6 },
+      { input: [2, 4, 6, 2, 8, 0, 4, 7, 9, 3, 5], expected: 2 },
+      { input: [1, 1, 1], expected: 1 }
+    ],
+    constraints: ["BST values are unique except p/q metadata"],
+    skillKeys: ["dsa.trees", "dsa.binary_search_tree"]
+  },
+  {
+    slug: "binary-tree-level-max-sum",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Binary Tree Level Max Sum",
+    description: "Treat values as a level-order binary tree where -1 means missing. Return the 1-based level with the maximum sum. If tied, return the smallest level.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS by level over implicit indices and skip missing children.</p>",
+    testCases: [
+      { input: [1, 7, 0, 7, -8, -1, -1], expected: 2 },
+      { input: [-1], expected: 0 },
+      { input: [5], expected: 1 }
+    ],
+    constraints: ["-1 marks missing node", "Return 0 for an empty/missing root"],
+    skillKeys: ["dsa.trees", "dsa.bfs"]
+  },
+  {
+    slug: "house-robber-line",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "House Robber Line",
+    description: "Each value is a non-negative reward. Return the maximum reward you can collect without taking adjacent positions.",
+    acceptanceText: "<p><strong>Expected:</strong> Rolling DP with take/skip states. Do not mutate the input unnecessarily.</p>",
+    testCases: [
+      { input: [2, 7, 9, 3, 1], expected: 12 },
+      { input: [5, 1, 1, 5], expected: 10 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["0 <= nums.length <= 200000"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "coin-change-minimum",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Coin Change Minimum",
+    description: "The first number is target amount. Remaining positive numbers are coin denominations. Return the fewest coins needed to make target, or -1 if impossible.",
+    acceptanceText: "<p><strong>Expected:</strong> Bottom-up DP over amount with unreachable sentinel values.</p>",
+    testCases: [
+      { input: [11, 1, 2, 5], expected: 3 },
+      { input: [3, 2], expected: -1 },
+      { input: [0, 1, 2], expected: 0 }
+    ],
+    constraints: ["Coins may be unsorted", "Unlimited use of each coin"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "longest-increasing-subsequence-length",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Increasing Subsequence Length",
+    description: "Return the length of the longest strictly increasing subsequence.",
+    acceptanceText: "<p><strong>Expected:</strong> O(n log n) tails array preferred; O(n²) DP acceptable for explanation if constraints are discussed.</p>",
+    testCases: [
+      { input: [10, 9, 2, 5, 3, 7, 101, 18], expected: 4 },
+      { input: [3, 3, 3], expected: 1 },
+      { input: [1, 2, 3, 4], expected: 4 }
+    ],
+    constraints: ["Strictly increasing, not non-decreasing"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.binary_search"]
+  },
+  {
+    slug: "decode-ways-count",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Decode Ways Count",
+    description: "Digits are provided as numbers 0..9. Treat them as a digit string where 1=A through 26=Z. Return the number of valid decodings.",
+    acceptanceText: "<p><strong>Expected:</strong> DP over positions with single-digit and two-digit transitions. Zero handling is the key edge case.</p>",
+    testCases: [
+      { input: [1, 2], expected: 2 },
+      { input: [2, 2, 6], expected: 3 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Each input value should be treated as one digit"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "edit-distance-lite",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Edit Distance Lite",
+    description: "The first number is split index. Values before split are the first sequence, values after split are the second sequence. Return the minimum insert/delete/replace operations needed to transform the first sequence into the second.",
+    acceptanceText: "<p><strong>Expected:</strong> Classic 2D DP with base cases for empty prefixes. Rolling rows are a good optimization.</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 1, 3], expected: 1 },
+      { input: [0, 4, 5], expected: 2 },
+      { input: [2, 7, 8, 7, 8], expected: 0 }
+    ],
+    constraints: ["First value gives length of first sequence"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "longest-palindromic-subsequence",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Palindromic Subsequence",
+    description: "Values represent characters. Return the length of the longest palindromic subsequence.",
+    acceptanceText: "<p><strong>Expected:</strong> Interval DP from shorter ranges to longer ranges.</p>",
+    testCases: [
+      { input: [1, 2, 2, 1], expected: 4 },
+      { input: [1, 2, 3, 2, 1], expected: 5 },
+      { input: [1, 2, 3], expected: 1 }
+    ],
+    constraints: ["Subsequence, not substring"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "partition-equal-subset",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Partition Equal Subset",
+    description: "Return 1 if the array can be partitioned into two subsets with equal sum, otherwise return 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Subset-sum DP up to total/2. Reject odd total sum immediately.</p>",
+    testCases: [
+      { input: [1, 5, 11, 5], expected: 1 },
+      { input: [1, 2, 3, 5], expected: 0 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "valid-parentheses-score",
+    topic: "Stack",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Valid Parentheses Score",
+    description: "Values encode brackets: 1='(', 2=')', 3='[', 4=']', 5='{', 6='}'. Return 1 if the sequence is valid, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Stack of expected closing brackets. Fail fast on mismatches and leftover openings.</p>",
+    testCases: [
+      { input: [1, 3, 4, 2], expected: 1 },
+      { input: [1, 3, 2, 4], expected: 0 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["Ignore no values; every value is a bracket token"],
+    skillKeys: ["dsa.stack"]
+  },
+  {
+    slug: "min-stack-final-minimum",
+    topic: "Stack",
+    difficulty: "MEDIUM",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Min Stack Final Minimum",
+    description: "Operations are encoded as pairs: op,value. op=1 means push value, op=2 means pop and value is ignored. Return the current minimum after all operations, or 0 if the stack is empty.",
+    acceptanceText: "<p><strong>Expected:</strong> Maintain a second stack of minimums or store value/currentMin pairs.</p>",
+    testCases: [
+      { input: [1, 3, 1, 5, 1, 2, 2, 0], expected: 3 },
+      { input: [1, 4, 1, 1], expected: 1 },
+      { input: [2, 0], expected: 0 }
+    ],
+    constraints: ["Input length is even", "Pop on empty stack should be ignored"],
+    skillKeys: ["dsa.stack"]
+  },
+  {
+    slug: "trapping-rain-water",
+    topic: "Two Pointers",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Trapping Rain Water",
+    description: "Each value is an elevation height. Return how many units of water can be trapped after raining.",
+    acceptanceText: "<p><strong>Expected:</strong> Two pointers with leftMax/rightMax, or prefix/suffix maxima. Explain why water is bounded by the smaller side.</p>",
+    testCases: [
+      { input: [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1], expected: 6 },
+      { input: [4, 2, 0, 3, 2, 5], expected: 9 },
+      { input: [1, 2, 3], expected: 0 }
+    ],
+    constraints: ["Heights are non-negative"],
+    skillKeys: ["dsa.two_pointers", "dsa.arrays"]
+  },
+  {
+    slug: "container-with-most-water",
+    topic: "Two Pointers",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Container With Most Water",
+    description: "Each value is a vertical line height. Return the maximum area formed by choosing two lines.",
+    acceptanceText: "<p><strong>Expected:</strong> Two pointers moving the smaller height inward because width only decreases.</p>",
+    testCases: [
+      { input: [1, 8, 6, 2, 5, 4, 8, 3, 7], expected: 49 },
+      { input: [1, 1], expected: 1 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["Area uses distance between indices"],
+    skillKeys: ["dsa.two_pointers", "dsa.greedy"]
+  },
+  {
+    slug: "stock-profit-with-cooldown",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Zerodha",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Stock Profit With Cooldown",
+    description: "Each value is a stock price. You may buy/sell multiple times, but after selling you must cooldown for one day. Return maximum profit.",
+    acceptanceText: "<p><strong>Expected:</strong> DP states for hold, sold, and rest. Avoid greedy local decisions.</p>",
+    testCases: [
+      { input: [1, 2, 3, 0, 2], expected: 3 },
+      { input: [1], expected: 0 },
+      { input: [6, 1, 3, 2, 4, 7], expected: 6 }
+    ],
+    constraints: ["One share max at a time"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "subarray-sum-equals-k",
+    topic: "Prefix Sums",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Subarray Sum Equals K",
+    description: "The first number is k. Remaining values may be positive, zero, or negative. Return the number of contiguous subarrays whose sum equals k.",
+    acceptanceText: "<p><strong>Expected:</strong> Prefix sum frequency map. Sliding window is not valid when negatives exist.</p>",
+    testCases: [
+      { input: [2, 1, 1, 1], expected: 2 },
+      { input: [0, 0, 0], expected: 3 },
+      { input: [3, 1, 2, 3], expected: 2 }
+    ],
+    constraints: ["Values can be negative", "First value is k"],
+    skillKeys: ["dsa.prefix_sums", "dsa.hashing"]
+  },
+  {
+    slug: "longest-consecutive-sequence",
+    topic: "Hashing",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Consecutive Sequence",
+    description: "Return the length of the longest consecutive integer sequence, regardless of original order.",
+    acceptanceText: "<p><strong>Expected:</strong> Hash set and only start counting at sequence starts where value - 1 is absent.</p>",
+    testCases: [
+      { input: [100, 4, 200, 1, 3, 2], expected: 4 },
+      { input: [0, 3, 7, 2, 5, 8, 4, 6, 0, 1], expected: 9 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["O(n) target solution"],
+    skillKeys: ["dsa.hashing"]
+  },
+  {
+    slug: "first-missing-positive",
+    topic: "Arrays",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "First Missing Positive",
+    description: "Return the smallest positive integer missing from the array.",
+    acceptanceText: "<p><strong>Expected:</strong> In-place cyclic placement or sign marking. Sorting is simpler but not optimal.</p>",
+    testCases: [
+      { input: [1, 2, 0], expected: 3 },
+      { input: [3, 4, -1, 1], expected: 2 },
+      { input: [7, 8, 9, 11, 12], expected: 1 }
+    ],
+    constraints: ["Aim for O(n) time and O(1) extra space"],
+    skillKeys: ["dsa.arrays"]
+  },
+  {
+    slug: "missing-number-xor",
+    topic: "Bit Manipulation",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Missing Number XOR",
+    description: "The array contains n distinct numbers from 0..n with exactly one missing. Return the missing number.",
+    acceptanceText: "<p><strong>Expected:</strong> XOR all indices and values, or use arithmetic sum with overflow awareness.</p>",
+    testCases: [
+      { input: [3, 0, 1], expected: 2 },
+      { input: [0, 1], expected: 2 },
+      { input: [9, 6, 4, 2, 3, 5, 7, 0, 1], expected: 8 }
+    ],
+    constraints: ["Values are distinct and in 0..n"],
+    skillKeys: ["dsa.bit_manipulation", "dsa.arrays"]
+  },
+  {
+    slug: "single-number-xor",
+    topic: "Bit Manipulation",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Single Number XOR",
+    description: "Every value appears exactly twice except one value that appears once. Return that unique value.",
+    acceptanceText: "<p><strong>Expected:</strong> XOR cancellation in one pass with O(1) space.</p>",
+    testCases: [
+      { input: [2, 2, 1], expected: 1 },
+      { input: [4, 1, 2, 1, 2], expected: 4 },
+      { input: [1], expected: 1 }
+    ],
+    constraints: ["Exactly one value appears once"],
+    skillKeys: ["dsa.bit_manipulation"]
+  },
+  {
+    slug: "counting-bits-total",
+    topic: "Bit Manipulation",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Counting Bits Total",
+    description: "The first number is n. For every integer from 0 to n, count set bits. Return the sum of those counts.",
+    acceptanceText: "<p><strong>Expected:</strong> DP relation bits[i] = bits[i >> 1] + (i & 1), or Brian Kernighan with complexity discussion.</p>",
+    testCases: [
+      { input: [5], expected: 7 },
+      { input: [2], expected: 2 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["0 <= n <= 1000000"],
+    skillKeys: ["dsa.bit_manipulation", "dsa.dynamic_programming"]
+  },
+  {
+    slug: "trie-prefix-count",
+    topic: "Trie",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Trie Prefix Count",
+    description: "Values encode words separated by 0. The final word after the last 0 is the prefix. Return how many previous words start with that prefix.",
+    acceptanceText: "<p><strong>Expected:</strong> Build a trie with prefix counts or compare strings after parsing. Trie is the target signal.</p>",
+    testCases: [
+      { input: [1, 2, 0, 1, 2, 3, 0, 1, 4, 0, 1, 2], expected: 2 },
+      { input: [5, 0, 6, 0, 7], expected: 0 },
+      { input: [1, 2], expected: 0 }
+    ],
+    constraints: ["0 separates encoded words", "Final segment is the query prefix"],
+    skillKeys: ["dsa.trie", "dsa.strings"]
+  },
+  {
+    slug: "word-break-encoded",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Word Break Encoded",
+    description: "Values encode dictionary words separated by 0, then -1, then the target sequence. Return 1 if the target can be segmented into dictionary words, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> DP over target positions with dictionary lookup; trie optimization is a bonus.</p>",
+    testCases: [
+      { input: [1, 2, 0, 3, 0, -1, 1, 2, 3], expected: 1 },
+      { input: [1, 0, 2, 0, -1, 1, 2, 1], expected: 1 },
+      { input: [1, 2, 0, -1, 1, 3], expected: 0 }
+    ],
+    constraints: ["Dictionary appears before -1", "Target appears after -1"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.trie"]
+  },
+  {
+    slug: "lru-cache-hit-count",
+    topic: "Design",
+    difficulty: "HARD",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "LRU Cache Hit Count",
+    description: "The first number is capacity. Remaining values are page requests. Simulate an LRU cache and return the number of cache hits.",
+    acceptanceText: "<p><strong>Expected:</strong> Hash map plus doubly linked list concept, or ordered map. Explain O(1) get/put behavior.</p>",
+    testCases: [
+      { input: [2, 1, 2, 1, 3, 1, 2], expected: 2 },
+      { input: [1, 1, 2, 1], expected: 0 },
+      { input: [0, 1, 1], expected: 0 }
+    ],
+    constraints: ["First value is cache capacity", "Return hit count only"],
+    skillKeys: ["dsa.design", "dsa.hashing"]
+  },
+  {
+    slug: "serialize-tree-validity",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Preorder Serialization Validity",
+    description: "Values encode preorder traversal of a binary tree, where -1 means null. Return 1 if the serialization is valid, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Slot counting: non-null consumes one slot and creates two, null consumes one.</p>",
+    testCases: [
+      { input: [9, 3, 4, -1, -1, 1, -1, -1, 2, -1, 6, -1, -1], expected: 1 },
+      { input: [1, -1], expected: 0 },
+      { input: [-1], expected: 1 }
+    ],
+    constraints: ["-1 represents null"],
+    skillKeys: ["dsa.trees"]
+  },
+  {
+    slug: "max-path-sum-binary-tree",
+    topic: "Trees",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Binary Tree Maximum Path Sum",
+    description: "Treat values as level-order binary tree nodes where -100000 marks missing. Return the maximum path sum between any two nodes.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS returning best downward gain while updating a global best through each node.</p>",
+    testCases: [
+      { input: [1, 2, 3], expected: 6 },
+      { input: [-10, 9, 20, -100000, -100000, 15, 7], expected: 42 },
+      { input: [-3], expected: -3 }
+    ],
+    constraints: ["-100000 marks missing", "Path may start and end at any nodes"],
+    skillKeys: ["dsa.trees", "dsa.dynamic_programming"]
   }
-  return questions;
+];
+
+function buildDsaQuestions() {
+  return curatedDsaProblems.map<QuestionSeed>((problem) => ({
+    ...problem,
+    slug: slugify(`prepnexo-dsa-${problem.slug}`),
+    type: "DSA",
+    description: [
+      problem.description,
+      "",
+      "Implement solve(nums). Return one integer. Any target/window/grid metadata is encoded in nums as described."
+    ].join("\n"),
+    starterCode: starter(problem.heading),
+    examples: problem.testCases.slice(0, 2).map((testCase) => ({
+      input: testCase.input,
+      output: testCase.expected
+    })),
+    status: "ACTIVE"
+  }));
 }
 
 const systemDomains = [
