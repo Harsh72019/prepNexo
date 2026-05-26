@@ -3421,6 +3421,686 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
     ],
     constraints: ["Matrix values are 0 or 1"],
     skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
+  },
+  {
+    slug: "bfs-shortest-reach-count",
+    topic: "Graphs",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "BFS Shortest Reach Count",
+    description: "The first two numbers are n and maxDistance. Remaining values are undirected edges encoded as u,v pairs. Starting at node 0, return how many nodes are reachable within maxDistance edges.",
+    acceptanceText: "<p><strong>Expected:</strong> Build adjacency list and BFS by distance levels from node 0.</p>",
+    testCases: [
+      { input: [5, 2, 0, 1, 1, 2, 2, 3, 0, 4], expected: 4 },
+      { input: [4, 1, 1, 2], expected: 1 },
+      { input: [1, 0], expected: 1 }
+    ],
+    constraints: ["Nodes are 0-indexed", "Ignore incomplete trailing edge"],
+    skillKeys: ["dsa.graphs", "dsa.bfs"]
+  },
+  {
+    slug: "graph-valid-tree",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Graph Valid Tree",
+    description: "The first number is n. Remaining values are undirected edges encoded as u,v pairs. Return 1 if the graph is a valid tree, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Check edge count equals n - 1 and the graph is connected, or use union-find to reject cycles.</p>",
+    testCases: [
+      { input: [5, 0, 1, 0, 2, 0, 3, 1, 4], expected: 1 },
+      { input: [5, 0, 1, 1, 2, 2, 3, 1, 3, 1, 4], expected: 0 },
+      { input: [1], expected: 1 }
+    ],
+    constraints: ["Undirected graph"],
+    skillKeys: ["dsa.graphs", "dsa.union_find"]
+  },
+  {
+    slug: "detect-cycle-undirected",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Detect Cycle In Undirected Graph",
+    description: "The first number is n. Remaining values are undirected edges encoded as u,v pairs. Return 1 if any cycle exists, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS with parent tracking or union-find. Do not treat the immediate parent as a cycle.</p>",
+    testCases: [
+      { input: [3, 0, 1, 1, 2, 2, 0], expected: 1 },
+      { input: [4, 0, 1, 1, 2, 2, 3], expected: 0 },
+      { input: [2], expected: 0 }
+    ],
+    constraints: ["Nodes are 0-indexed"],
+    skillKeys: ["dsa.graphs", "dsa.dfs"]
+  },
+  {
+    slug: "bipartite-graph-check",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Bipartite Graph Check",
+    description: "The first number is n. Remaining values are undirected edges encoded as u,v pairs. Return 1 if the graph can be colored with two colors, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS/DFS coloring across all components. Conflicting colors mean not bipartite.</p>",
+    testCases: [
+      { input: [4, 0, 1, 1, 2, 2, 3, 3, 0], expected: 1 },
+      { input: [3, 0, 1, 1, 2, 2, 0], expected: 0 },
+      { input: [3], expected: 1 }
+    ],
+    constraints: ["Graph may be disconnected"],
+    skillKeys: ["dsa.graphs", "dsa.bfs"]
+  },
+  {
+    slug: "clone-graph-edge-count",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Clone Graph Edge Count",
+    description: "The first number is n. Remaining values are undirected edges. Conceptually clone the graph reachable from node 0 and return the number of undirected edges in the cloned component.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS/DFS with a node map to avoid duplicating clones. Count edges in the reached component once.</p>",
+    testCases: [
+      { input: [5, 0, 1, 1, 2, 3, 4], expected: 2 },
+      { input: [3, 0, 1, 1, 2, 2, 0], expected: 3 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["Return edges reachable from node 0"],
+    skillKeys: ["dsa.graphs", "dsa.dfs"]
+  },
+  {
+    slug: "all-paths-source-target-count",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "All Paths Source Target Count",
+    description: "The first number is n. Remaining values are directed edges u,v in a DAG. Return the number of paths from node 0 to node n - 1.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS with memoization or topological DP on DAG paths.</p>",
+    testCases: [
+      { input: [4, 0, 1, 0, 2, 1, 3, 2, 3], expected: 2 },
+      { input: [5, 0, 1, 0, 2, 0, 3, 1, 4, 2, 4, 3, 4], expected: 3 },
+      { input: [1], expected: 1 }
+    ],
+    constraints: ["Input graph is a DAG"],
+    skillKeys: ["dsa.graphs", "dsa.dynamic_programming"]
+  },
+  {
+    slug: "eventual-safe-nodes-count",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Eventual Safe Nodes Count",
+    description: "The first number is n. Remaining values are directed edges u,v. A node is safe if every path from it eventually ends without entering a cycle. Return the number of safe nodes.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS colors for cycle detection or reverse topological pruning by outdegree.</p>",
+    testCases: [
+      { input: [7, 0, 1, 0, 2, 1, 2, 1, 3, 2, 5, 3, 0, 4, 5], expected: 4 },
+      { input: [3, 0, 1, 1, 2], expected: 3 },
+      { input: [2, 0, 1, 1, 0], expected: 0 }
+    ],
+    constraints: ["Directed graph"],
+    skillKeys: ["dsa.graphs", "dsa.dfs"]
+  },
+  {
+    slug: "alien-dictionary-order-possible",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Alien Dictionary Order Possible",
+    description: "Words are encoded as positive token sequences separated by 0. Return 1 if a valid alien character order can exist, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Compare adjacent words to build precedence edges, reject invalid prefix cases, then detect cycles with topological sort.</p>",
+    testCases: [
+      { input: [1, 2, 0, 1, 3, 0, 2], expected: 1 },
+      { input: [1, 2, 0, 1], expected: 0 },
+      { input: [1, 0, 2, 0, 1], expected: 1 }
+    ],
+    constraints: ["0 separates words"],
+    skillKeys: ["dsa.graphs", "dsa.topological_sort", "dsa.trie"]
+  },
+  {
+    slug: "word-ladder-shortest-length",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Word Ladder Shortest Length",
+    description: "Words are equal-length token sequences separated by 0. The first word is begin, second word is end, remaining words are dictionary. Return the shortest transformation length changing one token at a time, or 0.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS over words using wildcard patterns or pairwise one-difference checks for small inputs.</p>",
+    testCases: [
+      { input: [1, 2, 0, 3, 4, 0, 1, 4, 0, 3, 4], expected: 3 },
+      { input: [1, 2, 0, 3, 4, 0, 1, 4], expected: 0 },
+      { input: [1, 0, 1], expected: 1 }
+    ],
+    constraints: ["All words are equal length within a test"],
+    skillKeys: ["dsa.graphs", "dsa.bfs"]
+  },
+  {
+    slug: "minimum-height-trees-count",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Height Trees Count",
+    description: "The first number is n. Remaining values are undirected tree edges. Return the number of possible roots that produce minimum height.",
+    acceptanceText: "<p><strong>Expected:</strong> Trim leaves layer by layer until one or two centroids remain.</p>",
+    testCases: [
+      { input: [4, 1, 0, 1, 2, 1, 3], expected: 1 },
+      { input: [6, 3, 0, 3, 1, 3, 2, 3, 4, 5, 4], expected: 2 },
+      { input: [1], expected: 1 }
+    ],
+    constraints: ["Input is a tree"],
+    skillKeys: ["dsa.trees", "dsa.graphs"]
+  },
+  {
+    slug: "tree-maximum-width",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Binary Tree Maximum Width",
+    description: "Treat values as level-order binary tree nodes where -1 marks missing. Return the maximum width counting null gaps between leftmost and rightmost non-missing nodes at any level.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS with normalized positional indices per level to avoid overflow.</p>",
+    testCases: [
+      { input: [1, 3, 2, 5, 3, -1, 9], expected: 4 },
+      { input: [1, 3, -1, 5, 3], expected: 2 },
+      { input: [-1], expected: 0 }
+    ],
+    constraints: ["-1 marks missing node"],
+    skillKeys: ["dsa.trees", "dsa.bfs"]
+  },
+  {
+    slug: "tree-right-side-view-sum",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Binary Tree Right Side View Sum",
+    description: "Treat values as a level-order binary tree where -1 marks missing. Return the sum of values visible from the right side.",
+    acceptanceText: "<p><strong>Expected:</strong> BFS level order and take the last valid node per level, or DFS right-first by depth.</p>",
+    testCases: [
+      { input: [1, 2, 3, -1, 5, -1, 4], expected: 8 },
+      { input: [1, -1, 3], expected: 4 },
+      { input: [-1], expected: 0 }
+    ],
+    constraints: ["-1 marks missing node"],
+    skillKeys: ["dsa.trees", "dsa.bfs"]
+  },
+  {
+    slug: "path-sum-count",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Binary Tree Path Sum Count",
+    description: "The first number is target. Remaining values are a level-order binary tree where -100000 marks missing. Return the number of downward paths whose sum equals target.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS with prefix-sum frequency map. Paths may start and end at any nodes but must go downward.</p>",
+    testCases: [
+      { input: [8, 10, 5, -3, 3, 2, -100000, 11, 3, -2, -100000, 1], expected: 3 },
+      { input: [3, 1, 2, 3], expected: 2 },
+      { input: [5, -100000], expected: 0 }
+    ],
+    constraints: ["-100000 marks missing node"],
+    skillKeys: ["dsa.trees", "dsa.prefix_sums"]
+  },
+  {
+    slug: "validate-bst-level-order",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Validate BST Level Order",
+    description: "Treat values as a level-order binary tree where -100000 marks missing. Return 1 if the tree satisfies strict BST ordering, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS/BFS with lower and upper bounds, not just local parent-child checks.</p>",
+    testCases: [
+      { input: [2, 1, 3], expected: 1 },
+      { input: [5, 1, 4, -100000, -100000, 3, 6], expected: 0 },
+      { input: [-100000], expected: 1 }
+    ],
+    constraints: ["BST uses strict inequalities"],
+    skillKeys: ["dsa.trees", "dsa.binary_search_tree"]
+  },
+  {
+    slug: "kth-smallest-bst",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Kth Smallest In BST",
+    description: "The first number is k. Remaining values are inserted into a BST in order. Return the kth smallest value, or 0 if k is invalid.",
+    acceptanceText: "<p><strong>Expected:</strong> Inorder traversal of BST yields sorted values. Stop once kth value is reached.</p>",
+    testCases: [
+      { input: [1, 3, 1, 4, 2], expected: 1 },
+      { input: [3, 5, 3, 6, 2, 4, 1], expected: 3 },
+      { input: [5, 1, 2], expected: 0 }
+    ],
+    constraints: ["First value is k"],
+    skillKeys: ["dsa.trees", "dsa.binary_search_tree"]
+  },
+  {
+    slug: "recover-bst-swapped-sum",
+    topic: "Trees",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Recover Swapped BST Sum",
+    description: "The input is an inorder traversal of a BST where exactly two values were swapped. Recover the sorted inorder sequence and return the sum of the two values that were swapped.",
+    acceptanceText: "<p><strong>Expected:</strong> Detect the two inversions in inorder order. Adjacent and non-adjacent swaps both matter.</p>",
+    testCases: [
+      { input: [1, 3, 2, 4], expected: 5 },
+      { input: [3, 2, 1], expected: 4 },
+      { input: [1, 2, 3], expected: 0 }
+    ],
+    constraints: ["Exactly two values may be swapped; return 0 if already sorted"],
+    skillKeys: ["dsa.trees", "dsa.binary_search_tree"]
+  },
+  {
+    slug: "serialize-deserialize-tree-checksum",
+    topic: "Trees",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Serialize Deserialize Tree Checksum",
+    description: "Treat values as a level-order tree where -1 marks missing. Serialize then deserialize preserving structure. Return the preorder checksum sum(index * value) of non-missing nodes after round-trip.",
+    acceptanceText: "<p><strong>Expected:</strong> Preserve null markers during serialization so shape is not lost.</p>",
+    testCases: [
+      { input: [1, 2, 3, -1, -1, 4, 5], expected: 38 },
+      { input: [1], expected: 0 },
+      { input: [-1], expected: 0 }
+    ],
+    constraints: ["-1 marks missing node"],
+    skillKeys: ["dsa.trees", "dsa.design"]
+  },
+  {
+    slug: "union-find-largest-component",
+    topic: "Union Find",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Union Find Largest Component",
+    description: "The first number is n. Remaining values are undirected edges u,v. Return the size of the largest connected component.",
+    acceptanceText: "<p><strong>Expected:</strong> Union by size/rank with path compression, tracking component sizes.</p>",
+    testCases: [
+      { input: [5, 0, 1, 1, 2, 3, 4], expected: 3 },
+      { input: [4], expected: 1 },
+      { input: [6, 0, 1, 2, 3, 3, 4, 4, 5], expected: 4 }
+    ],
+    constraints: ["Nodes are 0-indexed"],
+    skillKeys: ["dsa.union_find", "dsa.graphs"]
+  },
+  {
+    slug: "accounts-merge-count",
+    topic: "Union Find",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Accounts Merge Count",
+    description: "Accounts are encoded as groups separated by 0. Values inside a group are email IDs. Accounts sharing any email belong to the same person. Return the number of merged people.",
+    acceptanceText: "<p><strong>Expected:</strong> Union accounts or emails by shared identifiers, then count unique roots among non-empty accounts.</p>",
+    testCases: [
+      { input: [1, 2, 0, 2, 3, 0, 4], expected: 2 },
+      { input: [1, 0, 2, 0, 3], expected: 3 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["0 separates accounts"],
+    skillKeys: ["dsa.union_find", "dsa.hashing"]
+  },
+  {
+    slug: "surrounded-regions-captured-count",
+    topic: "Union Find",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Surrounded Regions Captured Count",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened board where 1 is O and 0 is X. Return how many O cells would be captured because they are not connected to the border.",
+    acceptanceText: "<p><strong>Expected:</strong> DFS/BFS from border O cells or union-find with a virtual border node.</p>",
+    testCases: [
+      { input: [4, 4, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0], expected: 3 },
+      { input: [2, 2, 1, 1, 1, 1], expected: 0 },
+      { input: [1, 1, 1], expected: 0 }
+    ],
+    constraints: ["1 means O, 0 means X"],
+    skillKeys: ["dsa.union_find", "dsa.graphs"]
+  },
+  {
+    slug: "swim-rising-water-time",
+    topic: "Union Find",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Swim In Rising Water Time",
+    description: "The first number is n. Remaining values form an n x n grid of elevations. Return the minimum time when top-left can reach bottom-right moving 4-directionally through cells with elevation <= time.",
+    acceptanceText: "<p><strong>Expected:</strong> Dijkstra over grid or union cells by increasing elevation until endpoints connect.</p>",
+    testCases: [
+      { input: [2, 0, 2, 1, 3], expected: 3 },
+      { input: [1, 7], expected: 7 },
+      { input: [3, 0, 1, 2, 5, 4, 3, 6, 7, 8], expected: 8 }
+    ],
+    constraints: ["Grid is square"],
+    skillKeys: ["dsa.union_find", "dsa.graphs", "dsa.heaps"]
+  },
+  {
+    slug: "trie-word-search-count",
+    topic: "Trie",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Trie Word Search Count",
+    description: "The first two numbers are rows and cols. Next rows*cols values are a board. Remaining words are separated by 0. Return how many dictionary words can be formed by adjacent board cells without reusing a cell.",
+    acceptanceText: "<p><strong>Expected:</strong> Build a trie of words and DFS from board cells with visited tracking and prefix pruning.</p>",
+    testCases: [
+      { input: [2, 2, 1, 2, 3, 4, 1, 2, 0, 1, 3, 0, 4, 2], expected: 2 },
+      { input: [1, 2, 1, 2, 2, 1], expected: 0 },
+      { input: [0, 0], expected: 0 }
+    ],
+    constraints: ["Words are token sequences separated by 0"],
+    skillKeys: ["dsa.trie", "dsa.backtracking"]
+  },
+  {
+    slug: "replace-words-total-length",
+    topic: "Trie",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Replace Words Total Length",
+    description: "Input is dictionary roots separated by 0, then -1, then sentence words separated by 0. Replace each sentence word with the shortest dictionary root prefix if present. Return total length after replacement.",
+    acceptanceText: "<p><strong>Expected:</strong> Trie for roots and shortest-prefix lookup per sentence word.</p>",
+    testCases: [
+      { input: [1, 0, 1, 2, 0, -1, 1, 2, 3, 0, 2, 3], expected: 3 },
+      { input: [5, 0, -1, 1, 2, 0, 3], expected: 3 },
+      { input: [-1], expected: 0 }
+    ],
+    constraints: ["0 separates words; -1 separates dictionary and sentence"],
+    skillKeys: ["dsa.trie", "dsa.strings"]
+  },
+  {
+    slug: "maximum-xor-pair",
+    topic: "Trie",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximum XOR Pair",
+    description: "Return the maximum XOR value obtainable from any pair of numbers in the array.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary trie over bits, or greedy prefix-set approach by bit position.</p>",
+    testCases: [
+      { input: [3, 10, 5, 25, 2, 8], expected: 28 },
+      { input: [0], expected: 0 },
+      { input: [2, 4], expected: 6 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.trie", "dsa.bit_manipulation"]
+  },
+  {
+    slug: "letter-combinations-count",
+    topic: "Backtracking",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Phone Letter Combinations Count",
+    description: "Digits are values from 2 to 9. Return the number of possible phone keypad letter combinations.",
+    acceptanceText: "<p><strong>Expected:</strong> Backtracking/product counting. Digits 7 and 9 have four letters; others have three.</p>",
+    testCases: [
+      { input: [2, 3], expected: 9 },
+      { input: [7], expected: 4 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Digits are 2..9"],
+    skillKeys: ["dsa.backtracking"]
+  },
+  {
+    slug: "generate-parentheses-count",
+    topic: "Backtracking",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Generate Parentheses Count",
+    description: "The first number is n pairs of parentheses. Return how many valid parentheses strings can be generated.",
+    acceptanceText: "<p><strong>Expected:</strong> Backtrack with open/close counts, or use Catalan numbers. Only add ')' when close < open.</p>",
+    testCases: [
+      { input: [3], expected: 5 },
+      { input: [1], expected: 1 },
+      { input: [0], expected: 1 }
+    ],
+    constraints: ["n >= 0"],
+    skillKeys: ["dsa.backtracking", "dsa.recursion"]
+  },
+  {
+    slug: "combination-sum-unique-count",
+    topic: "Backtracking",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Combination Sum Unique Count",
+    description: "The first number is target. Remaining positive values are candidates that can be used unlimited times. Return the number of unique non-decreasing combinations that sum to target.",
+    acceptanceText: "<p><strong>Expected:</strong> Backtrack with a start index so combinations are generated in non-decreasing order.</p>",
+    testCases: [
+      { input: [7, 2, 3, 6, 7], expected: 2 },
+      { input: [8, 2, 3, 5], expected: 3 },
+      { input: [1, 2], expected: 0 }
+    ],
+    constraints: ["Candidate reuse is allowed"],
+    skillKeys: ["dsa.backtracking"]
+  },
+  {
+    slug: "subsets-with-duplicates-count",
+    topic: "Backtracking",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Subsets With Duplicates Count",
+    description: "Return the number of unique subsets that can be formed from the array, which may contain duplicates.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort and skip duplicate branches, or multiply frequency + 1 over distinct values.</p>",
+    testCases: [
+      { input: [1, 2, 2], expected: 6 },
+      { input: [0], expected: 2 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["Subsets are unique by value multiset"],
+    skillKeys: ["dsa.backtracking"]
+  },
+  {
+    slug: "permutations-unique-count",
+    topic: "Backtracking",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Unique Permutations Count",
+    description: "Return the number of unique permutations of the array, which may contain duplicate values.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort with used flags and skip duplicate choices, or compute n! divided by duplicate factorials.</p>",
+    testCases: [
+      { input: [1, 1, 2], expected: 3 },
+      { input: [1, 2, 3], expected: 6 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["Count unique permutations by value sequence"],
+    skillKeys: ["dsa.backtracking"]
+  },
+  {
+    slug: "n-queens-solution-count",
+    topic: "Backtracking",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "N Queens Solution Count",
+    description: "The first number is n. Return the number of ways to place n queens on an n x n board so no queens attack each other.",
+    acceptanceText: "<p><strong>Expected:</strong> Backtrack row by row using occupied columns and diagonals sets/bitmasks.</p>",
+    testCases: [
+      { input: [4], expected: 2 },
+      { input: [1], expected: 1 },
+      { input: [2], expected: 0 }
+    ],
+    constraints: ["n is small enough for backtracking"],
+    skillKeys: ["dsa.backtracking", "dsa.recursion"]
+  },
+  {
+    slug: "sudoku-validity-check",
+    topic: "Backtracking",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Sudoku Validity Check",
+    description: "Input is 81 values for a 9x9 Sudoku board, where 0 means empty. Return 1 if the filled cells do not violate row, column, or 3x3 box rules.",
+    acceptanceText: "<p><strong>Expected:</strong> Track seen digits per row, column, and box. This is the validation foundation before solving.</p>",
+    testCases: [
+      { input: [5,3,0,0,7,0,0,0,0,6,0,0,1,9,5,0,0,0,0,9,8,0,0,0,0,6,0,8,0,0,0,6,0,0,0,3,4,0,0,8,0,3,0,0,1,7,0,0,0,2,0,0,0,6,0,6,0,0,0,0,2,8,0,0,0,0,4,1,9,0,0,5,0,0,0,0,8,0,0,7,9], expected: 1 },
+      { input: [8,3,0,0,7,0,0,0,0,6,0,0,1,9,5,0,0,0,0,9,8,0,0,0,0,6,0,8,0,0,0,6,0,0,0,3,4,0,0,8,0,3,0,0,1,7,0,0,0,2,0,0,0,6,0,6,0,0,0,0,2,8,0,0,0,0,4,1,9,0,0,5,0,0,0,0,8,0,0,7,9], expected: 0 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["0 means empty"],
+    skillKeys: ["dsa.backtracking", "dsa.matrix"]
+  },
+  {
+    slug: "gray-code-last-value",
+    topic: "Bit Manipulation",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Gray Code Last Value",
+    description: "The first number is n bits. Generate the standard reflected Gray code sequence and return the last value.",
+    acceptanceText: "<p><strong>Expected:</strong> Use formula i ^ (i >> 1), or recursive reflection. Last value for size n is gray(2^n - 1).</p>",
+    testCases: [
+      { input: [2], expected: 2 },
+      { input: [3], expected: 4 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["0 <= n <= 20"],
+    skillKeys: ["dsa.bit_manipulation"]
+  },
+  {
+    slug: "bitwise-and-range",
+    topic: "Bit Manipulation",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Bitwise AND Of Range",
+    description: "The first two numbers are left and right. Return the bitwise AND of every integer in the inclusive range [left, right].",
+    acceptanceText: "<p><strong>Expected:</strong> Shift both bounds right until equal to find the common prefix, then shift back.</p>",
+    testCases: [
+      { input: [5, 7], expected: 4 },
+      { input: [0, 0], expected: 0 },
+      { input: [1, 2147483647], expected: 0 }
+    ],
+    constraints: ["0 <= left <= right"],
+    skillKeys: ["dsa.bit_manipulation"]
+  },
+  {
+    slug: "reverse-bits-low-byte",
+    topic: "Bit Manipulation",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Reverse Bits Low Byte",
+    description: "The first number is x. Consider only its lowest 8 bits. Reverse those 8 bits and return the resulting value.",
+    acceptanceText: "<p><strong>Expected:</strong> Loop over 8 bits, shifting result left and reading x's low bit each step.</p>",
+    testCases: [
+      { input: [13], expected: 176 },
+      { input: [1], expected: 128 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Use only lowest 8 bits"],
+    skillKeys: ["dsa.bit_manipulation"]
+  },
+  {
+    slug: "hamming-distance-sum",
+    topic: "Bit Manipulation",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Total Hamming Distance",
+    description: "Return the sum of Hamming distances over every unordered pair of values in the array.",
+    acceptanceText: "<p><strong>Expected:</strong> For each bit, count ones and zeroes; contribution is ones * zeroes.</p>",
+    testCases: [
+      { input: [4, 14, 2], expected: 6 },
+      { input: [4, 14, 4], expected: 4 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["Values are non-negative 32-bit integers"],
+    skillKeys: ["dsa.bit_manipulation"]
+  },
+  {
+    slug: "sum-without-plus",
+    topic: "Bit Manipulation",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Sum Without Plus",
+    description: "The first two numbers are a and b. Return their sum without using arithmetic plus or minus operators conceptually.",
+    acceptanceText: "<p><strong>Expected:</strong> XOR gives sum without carry; AND shifted left gives carry. Repeat until carry is zero.</p>",
+    testCases: [
+      { input: [1, 2], expected: 3 },
+      { input: [-2, 3], expected: 1 },
+      { input: [0, 0], expected: 0 }
+    ],
+    constraints: ["Use 32-bit signed integer behavior in languages that need masking"],
+    skillKeys: ["dsa.bit_manipulation"]
+  },
+  {
+    slug: "count-primes-sieve",
+    topic: "Math",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Count Primes Sieve",
+    description: "The first number is n. Return the number of prime numbers strictly less than n.",
+    acceptanceText: "<p><strong>Expected:</strong> Sieve of Eratosthenes. Start marking multiples at p*p.</p>",
+    testCases: [
+      { input: [10], expected: 4 },
+      { input: [0], expected: 0 },
+      { input: [100], expected: 25 }
+    ],
+    constraints: ["Count primes less than n"],
+    skillKeys: ["dsa.math"]
+  },
+  {
+    slug: "gcd-pair-normalization",
+    topic: "Math",
+    difficulty: "EASY",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "GCD Pair Normalization",
+    description: "Values are encoded as a,b pairs. For each pair, compute gcd(a,b). Return the sum of all gcd values.",
+    acceptanceText: "<p><strong>Expected:</strong> Euclidean algorithm. Normalize negative values with absolute value.</p>",
+    testCases: [
+      { input: [12, 18, 7, 13], expected: 7 },
+      { input: [8, 12, 9, 6, 10, 5], expected: 15 },
+      { input: [5], expected: 0 }
+    ],
+    constraints: ["Ignore incomplete trailing value"],
+    skillKeys: ["dsa.math"]
+  },
+  {
+    slug: "pow-mod-fast",
+    topic: "Math",
+    difficulty: "MEDIUM",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Fast Power Mod",
+    description: "The first three numbers are base, exponent, and mod. Return base^exponent modulo mod.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary exponentiation. Reduce base modulo mod and square while halving exponent.</p>",
+    testCases: [
+      { input: [2, 10, 1000], expected: 24 },
+      { input: [3, 0, 5], expected: 1 },
+      { input: [5, 3, 13], expected: 8 }
+    ],
+    constraints: ["exponent >= 0", "mod > 0"],
+    skillKeys: ["dsa.math", "dsa.recursion"]
+  },
+  {
+    slug: "kth-symbol-grammar",
+    topic: "Recursion",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Kth Symbol In Grammar",
+    description: "The first two numbers are n and k. Grammar starts with 0; each 0 becomes 01 and each 1 becomes 10. Return the kth symbol in row n using 1-based k.",
+    acceptanceText: "<p><strong>Expected:</strong> Recursive parent relation or parity of bits in k - 1.</p>",
+    testCases: [
+      { input: [1, 1], expected: 0 },
+      { input: [2, 2], expected: 1 },
+      { input: [4, 5], expected: 1 }
+    ],
+    constraints: ["k is 1-based"],
+    skillKeys: ["dsa.recursion", "dsa.bit_manipulation"]
   }
 ];
 
