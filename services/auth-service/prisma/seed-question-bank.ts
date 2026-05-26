@@ -4101,6 +4101,329 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
     ],
     constraints: ["k is 1-based"],
     skillKeys: ["dsa.recursion", "dsa.bit_manipulation"]
+  },
+  {
+    slug: "rotting-oranges-minutes",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Rotting Oranges Minutes",
+    description: "The first two numbers are rows and cols. Remaining values are a grid where 0 is empty, 1 is fresh, and 2 is rotten. Return minutes needed to rot every fresh orange, or -1.",
+    acceptanceText: "<p><strong>Expected:</strong> Multi-source BFS from all initially rotten cells, processing one minute per BFS layer.</p>",
+    testCases: [
+      { input: [3, 3, 2, 1, 1, 1, 1, 0, 0, 1, 1], expected: 4 },
+      { input: [3, 3, 2, 1, 1, 0, 1, 1, 1, 0, 1], expected: -1 },
+      { input: [1, 2, 0, 2], expected: 0 }
+    ],
+    constraints: ["Grid is flattened row-major"],
+    skillKeys: ["dsa.graphs", "dsa.bfs", "dsa.matrix"]
+  },
+  {
+    slug: "minimum-effort-path",
+    topic: "Graphs",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Path With Minimum Effort",
+    description: "The first two numbers are rows and cols. Remaining values are heights. Path effort is the maximum absolute height difference between adjacent cells on the path. Return the minimum possible effort from top-left to bottom-right.",
+    acceptanceText: "<p><strong>Expected:</strong> Dijkstra over grid with edge cost as absolute difference, or binary search effort with BFS feasibility.</p>",
+    testCases: [
+      { input: [3, 3, 1, 2, 2, 3, 8, 2, 5, 3, 5], expected: 2 },
+      { input: [3, 3, 1, 2, 3, 3, 8, 4, 5, 3, 5], expected: 1 },
+      { input: [1, 1, 7], expected: 0 }
+    ],
+    constraints: ["4-direction movement"],
+    skillKeys: ["dsa.graphs", "dsa.heaps", "dsa.binary_search"]
+  },
+  {
+    slug: "cheapest-flight-k-stops",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Cheapest Flight Within K Stops",
+    description: "Input is n, src, dst, k, then directed weighted flights u,v,cost. Return the cheapest price from src to dst using at most k stops, or -1.",
+    acceptanceText: "<p><strong>Expected:</strong> Bellman-Ford for k + 1 edges or modified Dijkstra with stop count state.</p>",
+    testCases: [
+      { input: [4, 0, 3, 1, 0, 1, 100, 1, 2, 100, 2, 3, 100, 0, 3, 500], expected: 500 },
+      { input: [4, 0, 3, 2, 0, 1, 100, 1, 2, 100, 2, 3, 100, 0, 3, 500], expected: 300 },
+      { input: [3, 0, 2, 0, 0, 1, 100, 1, 2, 100], expected: -1 }
+    ],
+    constraints: ["Stops are intermediate nodes, so k stops means up to k + 1 edges"],
+    skillKeys: ["dsa.graphs", "dsa.shortest_path"]
+  },
+  {
+    slug: "critical-connections-count",
+    topic: "Graphs",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Critical Connections Count",
+    description: "The first number is n. Remaining values are undirected edges. Return the number of bridges: edges whose removal increases the number of connected components.",
+    acceptanceText: "<p><strong>Expected:</strong> Tarjan DFS with discovery time and low-link values.</p>",
+    testCases: [
+      { input: [4, 0, 1, 1, 2, 2, 0, 1, 3], expected: 1 },
+      { input: [2, 0, 1], expected: 1 },
+      { input: [3, 0, 1, 1, 2, 2, 0], expected: 0 }
+    ],
+    constraints: ["Undirected graph"],
+    skillKeys: ["dsa.graphs", "dsa.dfs"]
+  },
+  {
+    slug: "largest-bst-subtree-size",
+    topic: "Trees",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Largest BST Subtree Size",
+    description: "Treat values as a level-order binary tree where -100000 marks missing. Return the size of the largest subtree that is a valid BST.",
+    acceptanceText: "<p><strong>Expected:</strong> Postorder DFS returning subtree min, max, size, and validity.</p>",
+    testCases: [
+      { input: [10, 5, 15, 1, 8, -100000, 7], expected: 3 },
+      { input: [2, 1, 3], expected: 3 },
+      { input: [-100000], expected: 0 }
+    ],
+    constraints: ["BST uses strict ordering"],
+    skillKeys: ["dsa.trees", "dsa.binary_search_tree"]
+  },
+  {
+    slug: "construct-tree-preorder-inorder-root",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Construct Tree Root Check",
+    description: "The first number is n. The next n values are preorder traversal and the following n values are inorder traversal of a binary tree with unique values. Reconstruct the tree and return its root value.",
+    acceptanceText: "<p><strong>Expected:</strong> Use preorder root and inorder index map to split left/right subtrees recursively.</p>",
+    testCases: [
+      { input: [5, 3, 9, 20, 15, 7, 9, 3, 15, 20, 7], expected: 3 },
+      { input: [1, -1, -1], expected: -1 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Values are unique"],
+    skillKeys: ["dsa.trees", "dsa.recursion"]
+  },
+  {
+    slug: "flatten-tree-preorder-checksum",
+    topic: "Trees",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Flatten Binary Tree Preorder Checksum",
+    description: "Treat values as a level-order tree where -1 marks missing. Flatten it to a linked list in preorder and return sum(index * value) over the flattened sequence.",
+    acceptanceText: "<p><strong>Expected:</strong> Reverse preorder recursion or iterative stack. Preserve preorder exactly.</p>",
+    testCases: [
+      { input: [1, 2, 5, 3, 4, -1, 6], expected: 62 },
+      { input: [1], expected: 0 },
+      { input: [-1], expected: 0 }
+    ],
+    constraints: ["-1 marks missing node"],
+    skillKeys: ["dsa.trees", "dsa.stack"]
+  },
+  {
+    slug: "disjoint-set-equations",
+    topic: "Union Find",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Satisfiability Of Equality Equations",
+    description: "Equations are encoded as triples a,op,b where op=1 means equality and op=0 means inequality. Return 1 if all equations can be satisfied, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Union all equal pairs first, then verify no inequality pair has the same root.</p>",
+    testCases: [
+      { input: [1, 1, 2, 2, 0, 3], expected: 1 },
+      { input: [1, 1, 2, 2, 1, 3, 1, 0, 3], expected: 0 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["Triples are variableA, op, variableB"],
+    skillKeys: ["dsa.union_find"]
+  },
+  {
+    slug: "couples-holding-hands-swaps",
+    topic: "Union Find",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Couples Holding Hands Minimum Swaps",
+    description: "Values are people seated in a row. Couple IDs are floor(person / 2). Return the minimum swaps needed so every couple sits together.",
+    acceptanceText: "<p><strong>Expected:</strong> Union couple IDs by current couch pairs; swaps needed per component is size - 1.</p>",
+    testCases: [
+      { input: [0, 2, 1, 3], expected: 1 },
+      { input: [3, 2, 0, 1], expected: 0 },
+      { input: [0, 4, 1, 2, 3, 5], expected: 2 }
+    ],
+    constraints: ["Row length is even"],
+    skillKeys: ["dsa.union_find", "dsa.greedy"]
+  },
+  {
+    slug: "prefix-score-trie-sum",
+    topic: "Trie",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Prefix Score Trie Sum",
+    description: "Words are encoded as positive values separated by 0. For every word, its score is the sum of counts of words sharing each prefix of that word. Return the sum of all word scores.",
+    acceptanceText: "<p><strong>Expected:</strong> Trie nodes store pass counts. Query each word by walking its prefixes and summing pass counts.</p>",
+    testCases: [
+      { input: [1, 2, 0, 1, 0, 1, 2, 3], expected: 10 },
+      { input: [5, 0, 6], expected: 2 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["0 separates words"],
+    skillKeys: ["dsa.trie"]
+  },
+  {
+    slug: "stream-median-last",
+    topic: "Heaps",
+    difficulty: "HARD",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Stream Median Last",
+    description: "Numbers arrive in order. Maintain the running median after every insertion and return the final floor median.",
+    acceptanceText: "<p><strong>Expected:</strong> Two heaps: max-heap for lower half, min-heap for upper half, with size rebalancing.</p>",
+    testCases: [
+      { input: [5, 15, 1, 3], expected: 4 },
+      { input: [2, 4, 6], expected: 4 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["For even count, floor average of two middle values"],
+    skillKeys: ["dsa.heaps"]
+  },
+  {
+    slug: "reorganize-sequence-possible",
+    topic: "Heaps",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Reorganize Sequence Possible",
+    description: "Values are token IDs. Return 1 if they can be rearranged so no two adjacent values are equal, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Max frequency must be at most ceil(n / 2). A max-heap construction is a good follow-up.</p>",
+    testCases: [
+      { input: [1, 1, 1, 2, 2], expected: 1 },
+      { input: [1, 1, 1, 1, 2], expected: 0 },
+      { input: [], expected: 1 }
+    ],
+    constraints: ["Return feasibility only"],
+    skillKeys: ["dsa.heaps", "dsa.greedy"]
+  },
+  {
+    slug: "min-refuel-stops",
+    topic: "Heaps",
+    difficulty: "HARD",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Minimum Refuel Stops",
+    description: "Input is target, startFuel, then station pairs position,fuel sorted by position. Return minimum refuel stops to reach target, or -1.",
+    acceptanceText: "<p><strong>Expected:</strong> Max-heap of fuels from reachable stations; refuel greedily only when current fuel cannot reach next milestone.</p>",
+    testCases: [
+      { input: [100, 10, 10, 60, 20, 30, 30, 30, 60, 40], expected: 2 },
+      { input: [1, 1], expected: 0 },
+      { input: [100, 1, 10, 100], expected: -1 }
+    ],
+    constraints: ["Stations are sorted by position"],
+    skillKeys: ["dsa.heaps", "dsa.greedy"]
+  },
+  {
+    slug: "count-smaller-after-self-sum",
+    topic: "Sorting",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Count Smaller After Self Sum",
+    description: "For every index, count how many values to its right are smaller than nums[i]. Return the sum of these counts.",
+    acceptanceText: "<p><strong>Expected:</strong> Fenwick tree with coordinate compression or merge-sort counting.</p>",
+    testCases: [
+      { input: [5, 2, 6, 1], expected: 4 },
+      { input: [-1], expected: 0 },
+      { input: [-1, -1], expected: 0 }
+    ],
+    constraints: ["Return sum of per-index counts"],
+    skillKeys: ["dsa.sorting", "dsa.binary_indexed_tree"]
+  },
+  {
+    slug: "range-addition-maximum",
+    topic: "Prefix Sums",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Range Addition Maximum",
+    description: "The first number is n. Remaining values are operations l,r,delta using 0-based inclusive ranges. Apply all operations to an initially zero array of length n and return the maximum value.",
+    acceptanceText: "<p><strong>Expected:</strong> Difference array: add delta at l and subtract after r, then prefix scan for max.</p>",
+    testCases: [
+      { input: [5, 1, 3, 2, 2, 4, 3, 0, 2, -2], expected: 5 },
+      { input: [3, 0, 2, 5], expected: 5 },
+      { input: [0, 0, 1, 5], expected: 0 }
+    ],
+    constraints: ["Ignore incomplete trailing operation"],
+    skillKeys: ["dsa.prefix_sums"]
+  },
+  {
+    slug: "segment-tree-range-min-total",
+    topic: "Segment Tree",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Segment Tree Range Min Total",
+    description: "The first number is n. The next n values are the array. Remaining operations are l,r range-min queries. Return the sum of all query minimums.",
+    acceptanceText: "<p><strong>Expected:</strong> Segment tree or sparse table. Segment tree is preferred if updates are discussed as a follow-up.</p>",
+    testCases: [
+      { input: [5, 5, 2, 6, 3, 1, 0, 2, 1, 4], expected: 3 },
+      { input: [3, 7, 8, 9, 0, 1], expected: 7 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Queries are inclusive"],
+    skillKeys: ["dsa.segment_tree"]
+  },
+  {
+    slug: "kmp-pattern-match-count",
+    topic: "Strings",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "KMP Pattern Match Count",
+    description: "The first number is pattern length. The next values form pattern and the remaining values form text. Return the number of pattern occurrences in text, including overlaps.",
+    acceptanceText: "<p><strong>Expected:</strong> Build LPS prefix table and scan text without rewinding.</p>",
+    testCases: [
+      { input: [2, 1, 1, 1, 1, 1], expected: 2 },
+      { input: [3, 1, 2, 1, 1, 2, 1, 2, 1], expected: 2 },
+      { input: [1, 5], expected: 0 }
+    ],
+    constraints: ["Occurrences may overlap"],
+    skillKeys: ["dsa.strings", "dsa.kmp"]
+  },
+  {
+    slug: "basic-calculator-ii",
+    topic: "Stack",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Basic Calculator II",
+    description: "Tokens encode an expression: non-negative numbers and operators where -1='+', -2='-', -3='*', -4='/'. Return the evaluated result with integer division truncating toward zero.",
+    acceptanceText: "<p><strong>Expected:</strong> Stack or running last term to handle multiplication/division precedence before addition/subtraction.</p>",
+    testCases: [
+      { input: [3, -1, 2, -3, 2], expected: 7 },
+      { input: [3, -4, 2], expected: 1 },
+      { input: [14, -2, 3, -4, 2], expected: 13 }
+    ],
+    constraints: ["Operators are encoded as negative tokens"],
+    skillKeys: ["dsa.stack"]
+  },
+  {
+    slug: "time-based-key-value-latest",
+    topic: "Design",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Time Based Key Value Store Latest Sum",
+    description: "Operations are encoded as op,key,time,value. op=1 sets key at time to value; op=2 gets key at time and ignores value. Return the sum of all get results, using 0 if absent.",
+    acceptanceText: "<p><strong>Expected:</strong> Map keys to sorted timestamp/value arrays and binary search latest timestamp <= query time.</p>",
+    testCases: [
+      { input: [1, 1, 10, 5, 1, 1, 20, 7, 2, 1, 15, 0, 2, 1, 25, 0], expected: 12 },
+      { input: [2, 1, 5, 0], expected: 0 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Operations are in non-decreasing time per key"],
+    skillKeys: ["dsa.design", "dsa.binary_search"]
   }
 ];
 
