@@ -1585,6 +1585,652 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
     ],
     constraints: ["-100000 marks missing", "Path may start and end at any nodes"],
     skillKeys: ["dsa.trees", "dsa.dynamic_programming"]
+  },
+  {
+    slug: "remove-duplicates-sorted-length",
+    topic: "Arrays",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Remove Duplicates Sorted Length",
+    description: "The array is sorted in non-decreasing order. Return the length after removing duplicates in-place conceptually, keeping only one copy of each distinct value.",
+    acceptanceText: "<p><strong>Expected:</strong> Two-pointer write index. Count unique values without allocating a new array for the intended solution.</p>",
+    testCases: [
+      { input: [1, 1, 2], expected: 2 },
+      { input: [0, 0, 1, 1, 1, 2, 2, 3], expected: 4 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Input is sorted", "Return the final unique length"],
+    skillKeys: ["dsa.arrays", "dsa.two_pointers"]
+  },
+  {
+    slug: "move-zeroes-stability-score",
+    topic: "Arrays",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Move Zeroes Stability Score",
+    description: "Move all zeroes to the end while preserving the relative order of non-zero values. Return the sum of index * value after the move.",
+    acceptanceText: "<p><strong>Expected:</strong> Stable compaction with a write pointer, then fill zeros. The score verifies order preservation.</p>",
+    testCases: [
+      { input: [0, 1, 0, 3, 12], expected: 33 },
+      { input: [0, 0, 1], expected: 0 },
+      { input: [4, 0, 5], expected: 5 }
+    ],
+    constraints: ["Preserve non-zero order", "Score uses 0-based indices"],
+    skillKeys: ["dsa.arrays", "dsa.two_pointers"]
+  },
+  {
+    slug: "rotate-array-checksum",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Rotate Array Checksum",
+    description: "The first number is k. Rotate the remaining array to the right by k positions. Return the weighted checksum sum(index * value) of the rotated array.",
+    acceptanceText: "<p><strong>Expected:</strong> Normalize k by n and use reversal or cyclic replacement. Handle empty arrays.</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 4, 5, 6, 7], expected: 70 },
+      { input: [2, -1, -100, 3, 99], expected: -203 },
+      { input: [5], expected: 0 }
+    ],
+    constraints: ["First value is k", "Checksum uses remaining array after rotation"],
+    skillKeys: ["dsa.arrays"]
+  },
+  {
+    slug: "sort-colors-transition-count",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Sort Colors Transition Count",
+    description: "Values are only 0, 1, and 2. After sorting them in-place conceptually, return the number of adjacent transitions where values differ.",
+    acceptanceText: "<p><strong>Expected:</strong> Dutch national flag three-pointer partition. The returned transition count validates the sorted grouping.</p>",
+    testCases: [
+      { input: [2, 0, 2, 1, 1, 0], expected: 2 },
+      { input: [1, 1, 1], expected: 0 },
+      { input: [2, 0], expected: 1 }
+    ],
+    constraints: ["Values are 0, 1, or 2"],
+    skillKeys: ["dsa.arrays", "dsa.two_pointers"]
+  },
+  {
+    slug: "next-permutation-checksum",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Next Permutation Checksum",
+    description: "Transform the array into the next lexicographical permutation. If none exists, transform it into ascending order. Return sum(index * value) after the transformation.",
+    acceptanceText: "<p><strong>Expected:</strong> Find the first decreasing pivot from the right, swap with the next larger suffix value, then reverse the suffix.</p>",
+    testCases: [
+      { input: [1, 2, 3], expected: 7 },
+      { input: [3, 2, 1], expected: 4 },
+      { input: [1, 1, 5], expected: 7 }
+    ],
+    constraints: ["Return checksum, not the array"],
+    skillKeys: ["dsa.arrays"]
+  },
+  {
+    slug: "array-leaders-count",
+    topic: "Arrays",
+    difficulty: "EASY",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Array Leaders Count",
+    description: "A leader is an element greater than every element to its right. Return the number of leaders in the array.",
+    acceptanceText: "<p><strong>Expected:</strong> Scan from right to left while tracking the maximum value seen so far.</p>",
+    testCases: [
+      { input: [16, 17, 4, 3, 5, 2], expected: 3 },
+      { input: [5, 4, 3, 2, 1], expected: 5 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Strictly greater than all values to the right"],
+    skillKeys: ["dsa.arrays"]
+  },
+  {
+    slug: "equilibrium-index-first",
+    topic: "Prefix Sums",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "First Equilibrium Index",
+    description: "Return the first index where the sum of values on the left equals the sum of values on the right. Return -1 if none exists.",
+    acceptanceText: "<p><strong>Expected:</strong> Use total sum and a running prefix. Do not recompute left/right sums for every index.</p>",
+    testCases: [
+      { input: [-7, 1, 5, 2, -4, 3, 0], expected: 3 },
+      { input: [1, 2, 3], expected: -1 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Return first valid index"],
+    skillKeys: ["dsa.prefix_sums", "dsa.arrays"]
+  },
+  {
+    slug: "range-sum-query-total",
+    topic: "Prefix Sums",
+    difficulty: "EASY",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Range Sum Query Total",
+    description: "The first number is n. The next n values are the array. Remaining values are query pairs l,r. Return the sum of all range-query sums.",
+    acceptanceText: "<p><strong>Expected:</strong> Build prefix sums once and answer each inclusive query in O(1).</p>",
+    testCases: [
+      { input: [5, 1, 2, 3, 4, 5, 0, 2, 1, 3], expected: 15 },
+      { input: [3, -1, 2, 4, 0, 2], expected: 5 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Queries are inclusive", "Ignore incomplete trailing query"],
+    skillKeys: ["dsa.prefix_sums"]
+  },
+  {
+    slug: "maximum-average-window-floor",
+    topic: "Sliding Window",
+    difficulty: "EASY",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximum Average Window Floor",
+    description: "The first number is k. Remaining values are scores. Return the floor of the maximum average over every contiguous window of length k.",
+    acceptanceText: "<p><strong>Expected:</strong> Fixed-size sliding window. Track max window sum and divide once at the end.</p>",
+    testCases: [
+      { input: [4, 1, 12, -5, -6, 50, 3], expected: 12 },
+      { input: [1, 5], expected: 5 },
+      { input: [3, 1, 2], expected: 0 }
+    ],
+    constraints: ["Return 0 if k is invalid or larger than array length"],
+    skillKeys: ["dsa.sliding_window"]
+  },
+  {
+    slug: "max-consecutive-ones-with-flips",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Max Consecutive Ones With Flips",
+    description: "The first number is k. Remaining values are binary bits. Return the longest contiguous segment containing only 1s after flipping at most k zeroes.",
+    acceptanceText: "<p><strong>Expected:</strong> Sliding window with a zero count, shrinking while zeroes exceed k.</p>",
+    testCases: [
+      { input: [2, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], expected: 6 },
+      { input: [0, 0, 0, 1], expected: 1 },
+      { input: [1, 0, 0, 1, 1], expected: 2 }
+    ],
+    constraints: ["Values after k are 0 or 1"],
+    skillKeys: ["dsa.sliding_window", "dsa.two_pointers"]
+  },
+  {
+    slug: "fruit-into-baskets-length",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Fruit Into Baskets Length",
+    description: "Each value is a fruit type. You have two baskets and each basket can hold one type. Return the longest contiguous segment containing at most two distinct values.",
+    acceptanceText: "<p><strong>Expected:</strong> Sliding window with a frequency map of at most two types.</p>",
+    testCases: [
+      { input: [1, 2, 1], expected: 3 },
+      { input: [0, 1, 2, 2], expected: 3 },
+      { input: [1, 2, 3, 2, 2], expected: 4 }
+    ],
+    constraints: ["At most two distinct values in chosen window"],
+    skillKeys: ["dsa.sliding_window", "dsa.hashing"]
+  },
+  {
+    slug: "permutation-inclusion-binary",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Permutation Inclusion Binary",
+    description: "The first number is m. The next m values are a pattern. Remaining values are a stream. Return 1 if any window in the stream is a permutation of the pattern, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Compare frequency counts over a fixed-size window, updating counts incrementally.</p>",
+    testCases: [
+      { input: [2, 1, 2, 3, 1, 2, 4], expected: 1 },
+      { input: [3, 1, 2, 3, 1, 1, 2], expected: 0 },
+      { input: [1, 5, 5], expected: 1 }
+    ],
+    constraints: ["First number is pattern length"],
+    skillKeys: ["dsa.sliding_window", "dsa.hashing"]
+  },
+  {
+    slug: "minimum-window-cover-length",
+    topic: "Sliding Window",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Window Cover Length",
+    description: "The first number is m. The next m values are required tokens. Remaining values are the stream. Return the length of the smallest window containing every required token with multiplicity, or 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Variable window with need/have counts and a formed counter. Shrink only while all requirements are satisfied.</p>",
+    testCases: [
+      { input: [3, 1, 2, 2, 5, 1, 2, 3, 2, 1], expected: 4 },
+      { input: [2, 7, 8, 1, 2, 3], expected: 0 },
+      { input: [1, 4, 4], expected: 1 }
+    ],
+    constraints: ["Required tokens may repeat"],
+    skillKeys: ["dsa.sliding_window", "dsa.hashing"]
+  },
+  {
+    slug: "three-sum-zero-count",
+    topic: "Two Pointers",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Three Sum Zero Count",
+    description: "Return the number of unique triplets by value that sum to zero.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort, fix one value, then use two pointers while skipping duplicates.</p>",
+    testCases: [
+      { input: [-1, 0, 1, 2, -1, -4], expected: 2 },
+      { input: [0, 0, 0, 0], expected: 1 },
+      { input: [1, 2, 3], expected: 0 }
+    ],
+    constraints: ["Count unique triplets by value"],
+    skillKeys: ["dsa.two_pointers", "dsa.sorting"]
+  },
+  {
+    slug: "four-sum-count-target",
+    topic: "Two Pointers",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Four Sum Target Count",
+    description: "The first number is target. Remaining values form the array. Return the number of unique quadruplets by value whose sum equals target.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort, fix two indices, use two pointers, and skip duplicate values at every level.</p>",
+    testCases: [
+      { input: [0, 1, 0, -1, 0, -2, 2], expected: 3 },
+      { input: [8, 2, 2, 2, 2, 2], expected: 1 },
+      { input: [10, 1, 2, 3], expected: 0 }
+    ],
+    constraints: ["First value is target", "Count unique quadruplets"],
+    skillKeys: ["dsa.two_pointers", "dsa.sorting"]
+  },
+  {
+    slug: "valid-palindrome-after-one-delete",
+    topic: "Two Pointers",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Valid Palindrome After One Delete",
+    description: "Values represent characters. Return 1 if the sequence can become a palindrome after deleting at most one value, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Two pointers and, on first mismatch, check either skipping left or skipping right.</p>",
+    testCases: [
+      { input: [1, 2, 3, 2, 1], expected: 1 },
+      { input: [1, 2, 3, 1], expected: 1 },
+      { input: [1, 2, 3, 4], expected: 0 }
+    ],
+    constraints: ["At most one deletion is allowed"],
+    skillKeys: ["dsa.two_pointers"]
+  },
+  {
+    slug: "squares-of-sorted-array-checksum",
+    topic: "Two Pointers",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Squares Of Sorted Array Checksum",
+    description: "The array is sorted. Square every value and return sum(index * squaredValue) after sorting the squared values.",
+    acceptanceText: "<p><strong>Expected:</strong> Fill from the end using two pointers comparing absolute values.</p>",
+    testCases: [
+      { input: [-4, -1, 0, 3, 10], expected: 467 },
+      { input: [-7, -3, 2, 3, 11], expected: 658 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Input is sorted non-decreasing"],
+    skillKeys: ["dsa.two_pointers", "dsa.arrays"]
+  },
+  {
+    slug: "subarray-product-less-than-k",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Subarray Product Less Than K",
+    description: "The first number is k. Remaining positive values form the array. Return the number of contiguous subarrays whose product is strictly less than k.",
+    acceptanceText: "<p><strong>Expected:</strong> Multiplicative sliding window. If k <= 1, return 0.</p>",
+    testCases: [
+      { input: [100, 10, 5, 2, 6], expected: 8 },
+      { input: [0, 1, 2, 3], expected: 0 },
+      { input: [10, 1, 1, 1], expected: 6 }
+    ],
+    constraints: ["Values after k are positive"],
+    skillKeys: ["dsa.sliding_window"]
+  },
+  {
+    slug: "longest-turbulent-subarray",
+    topic: "Sliding Window",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Turbulent Subarray",
+    description: "Return the length of the longest contiguous subarray where comparison signs alternate between greater-than and less-than.",
+    acceptanceText: "<p><strong>Expected:</strong> Track the previous comparison sign and reset correctly on equality or repeated sign.</p>",
+    testCases: [
+      { input: [9, 4, 2, 10, 7, 8, 8, 1, 9], expected: 5 },
+      { input: [4, 8, 12, 16], expected: 2 },
+      { input: [100], expected: 1 }
+    ],
+    constraints: ["Equal adjacent values break turbulence"],
+    skillKeys: ["dsa.sliding_window"]
+  },
+  {
+    slug: "majority-element-vote",
+    topic: "Arrays",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Majority Element Vote",
+    description: "Return the element that appears more than floor(n/2) times. If no such element exists, return -1.",
+    acceptanceText: "<p><strong>Expected:</strong> Boyer-Moore candidate selection plus a verification pass.</p>",
+    testCases: [
+      { input: [3, 2, 3], expected: 3 },
+      { input: [2, 2, 1, 1, 1, 2, 2], expected: 2 },
+      { input: [1, 2, 3], expected: -1 }
+    ],
+    constraints: ["Verify the candidate before returning"],
+    skillKeys: ["dsa.arrays", "dsa.greedy"]
+  },
+  {
+    slug: "find-all-duplicates-count",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Find All Duplicates Count",
+    description: "Values are in the range 1..n where n is array length. Return how many distinct values appear exactly twice.",
+    acceptanceText: "<p><strong>Expected:</strong> Use sign marking or cyclic placement for O(1) extra space, or a set as baseline.</p>",
+    testCases: [
+      { input: [4, 3, 2, 7, 8, 2, 3, 1], expected: 2 },
+      { input: [1, 1, 2], expected: 1 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["Values are in 1..n"],
+    skillKeys: ["dsa.arrays", "dsa.hashing"]
+  },
+  {
+    slug: "set-matrix-zeroes-count",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Set Matrix Zeroes Count",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened matrix. If a cell is 0, its entire row and column become 0. Return the count of zeroes after the operation.",
+    acceptanceText: "<p><strong>Expected:</strong> Mark affected rows and columns, ideally using first row/column as markers for O(1) extra space.</p>",
+    testCases: [
+      { input: [3, 3, 1, 1, 1, 1, 0, 1, 1, 1, 1], expected: 5 },
+      { input: [2, 2, 0, 1, 1, 1], expected: 3 },
+      { input: [1, 3, 1, 2, 3], expected: 0 }
+    ],
+    constraints: ["Matrix is flattened row-major"],
+    skillKeys: ["dsa.arrays"]
+  },
+  {
+    slug: "spiral-matrix-sum",
+    topic: "Arrays",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Spiral Matrix Weighted Sum",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened matrix. Traverse in spiral order and return sum(position * value) using 0-based spiral position.",
+    acceptanceText: "<p><strong>Expected:</strong> Maintain top/bottom/left/right boundaries and shrink them after each direction.</p>",
+    testCases: [
+      { input: [3, 3, 1, 2, 3, 4, 5, 6, 7, 8, 9], expected: 212 },
+      { input: [1, 4, 1, 2, 3, 4], expected: 20 },
+      { input: [0, 0], expected: 0 }
+    ],
+    constraints: ["Matrix is flattened row-major"],
+    skillKeys: ["dsa.arrays"]
+  },
+  {
+    slug: "valid-anagram-encoded",
+    topic: "Hashing",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Valid Anagram Encoded",
+    description: "The first number is split index. Values before split form sequence A and values after split form sequence B. Return 1 if A and B are anagrams, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Frequency map with increments for A and decrements for B, then verify all counts are zero.</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 3, 2, 1], expected: 1 },
+      { input: [2, 1, 2, 1, 1], expected: 0 },
+      { input: [0], expected: 1 }
+    ],
+    constraints: ["First number is length of sequence A"],
+    skillKeys: ["dsa.hashing"]
+  },
+  {
+    slug: "group-anagram-largest-size",
+    topic: "Hashing",
+    difficulty: "MEDIUM",
+    company: "Atlassian",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Group Anagram Largest Size",
+    description: "Words are encoded as positive values separated by 0. Return the size of the largest anagram group.",
+    acceptanceText: "<p><strong>Expected:</strong> Canonicalize each word by sorted token sequence or frequency signature and count group sizes.</p>",
+    testCases: [
+      { input: [1, 2, 0, 2, 1, 0, 3, 0], expected: 2 },
+      { input: [4, 5, 0, 6, 7, 0], expected: 1 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["0 separates words"],
+    skillKeys: ["dsa.hashing", "dsa.strings"]
+  },
+  {
+    slug: "isomorphic-sequences",
+    topic: "Hashing",
+    difficulty: "EASY",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Isomorphic Sequences",
+    description: "The first number is split index. Values before split form A and values after split form B. Return 1 if a one-to-one mapping can transform A into B.",
+    acceptanceText: "<p><strong>Expected:</strong> Maintain maps in both directions to prevent two values mapping to the same target.</p>",
+    testCases: [
+      { input: [3, 1, 2, 1, 7, 8, 7], expected: 1 },
+      { input: [3, 1, 2, 1, 7, 7, 8], expected: 0 },
+      { input: [2, 1, 2, 9], expected: 0 }
+    ],
+    constraints: ["Sequences must have equal length"],
+    skillKeys: ["dsa.hashing"]
+  },
+  {
+    slug: "ransom-note-possible",
+    topic: "Hashing",
+    difficulty: "EASY",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Ransom Note Possible",
+    description: "The first number is m. The next m values are required tokens. Remaining values are available magazine tokens. Return 1 if the required tokens can be constructed, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Count available tokens, then consume required tokens without going negative.</p>",
+    testCases: [
+      { input: [2, 1, 2, 2, 1, 3], expected: 1 },
+      { input: [2, 1, 1, 1], expected: 0 },
+      { input: [0, 5, 6], expected: 1 }
+    ],
+    constraints: ["First number is required length"],
+    skillKeys: ["dsa.hashing"]
+  },
+  {
+    slug: "longest-harmonious-subsequence",
+    topic: "Hashing",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Harmonious Subsequence",
+    description: "Return the length of the longest subsequence where max value and min value differ by exactly 1.",
+    acceptanceText: "<p><strong>Expected:</strong> Frequency map and check count[x] + count[x + 1] for every present x.</p>",
+    testCases: [
+      { input: [1, 3, 2, 2, 5, 2, 3, 7], expected: 5 },
+      { input: [1, 1, 1, 1], expected: 0 },
+      { input: [1, 2, 3, 4], expected: 2 }
+    ],
+    constraints: ["Subsequence need not be contiguous"],
+    skillKeys: ["dsa.hashing"]
+  },
+  {
+    slug: "least-recent-duplicate-distance",
+    topic: "Hashing",
+    difficulty: "MEDIUM",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Nearest Duplicate Distance",
+    description: "Return the minimum distance between two equal values. Return -1 if no value repeats.",
+    acceptanceText: "<p><strong>Expected:</strong> Track last index for each value and update the best distance on repeats.</p>",
+    testCases: [
+      { input: [1, 2, 3, 1, 2, 3, 2], expected: 2 },
+      { input: [1, 2, 3], expected: -1 },
+      { input: [5, 5], expected: 1 }
+    ],
+    constraints: ["Distance is absolute index difference"],
+    skillKeys: ["dsa.hashing"]
+  },
+  {
+    slug: "longest-zero-sum-subarray",
+    topic: "Prefix Sums",
+    difficulty: "MEDIUM",
+    company: "Zerodha",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Longest Zero Sum Subarray",
+    description: "Return the length of the longest contiguous subarray whose sum is zero.",
+    acceptanceText: "<p><strong>Expected:</strong> Prefix sum to earliest index map. Repeated prefix sums identify zero-sum windows.</p>",
+    testCases: [
+      { input: [15, -2, 2, -8, 1, 7, 10, 23], expected: 5 },
+      { input: [1, 2, 3], expected: 0 },
+      { input: [1, -1, 3, -3], expected: 4 }
+    ],
+    constraints: ["Values can be negative"],
+    skillKeys: ["dsa.prefix_sums", "dsa.hashing"]
+  },
+  {
+    slug: "contiguous-array-equal-zero-one",
+    topic: "Prefix Sums",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Contiguous Array Equal Zero One",
+    description: "Values are binary. Return the maximum length of a contiguous subarray with the same number of 0s and 1s.",
+    acceptanceText: "<p><strong>Expected:</strong> Treat 0 as -1 and use earliest prefix balance positions.</p>",
+    testCases: [
+      { input: [0, 1], expected: 2 },
+      { input: [0, 1, 0], expected: 2 },
+      { input: [0, 0, 1, 0, 0, 0, 1, 1], expected: 6 }
+    ],
+    constraints: ["Input values are 0 or 1"],
+    skillKeys: ["dsa.prefix_sums", "dsa.hashing"]
+  },
+  {
+    slug: "asteroid-collision-survivor-sum",
+    topic: "Stack",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Asteroid Collision Survivor Sum",
+    description: "Positive values move right and negative values move left. Equal sizes destroy each other. Return the sum of surviving asteroids.",
+    acceptanceText: "<p><strong>Expected:</strong> Stack of right-moving asteroids and collision resolution while the incoming asteroid moves left.</p>",
+    testCases: [
+      { input: [5, 10, -5], expected: 15 },
+      { input: [8, -8], expected: 0 },
+      { input: [10, 2, -5], expected: 10 }
+    ],
+    constraints: ["Zero values are not used"],
+    skillKeys: ["dsa.stack"]
+  },
+  {
+    slug: "remove-k-digits-min-number",
+    topic: "Monotonic Stack",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Remove K Digits Minimum Number",
+    description: "The first number is k. Remaining values are digits of a non-negative number. Remove exactly k digits to make the smallest possible number. Return the resulting number.",
+    acceptanceText: "<p><strong>Expected:</strong> Monotonic increasing stack, pop larger previous digits while k remains, strip leading zeroes.</p>",
+    testCases: [
+      { input: [3, 1, 4, 3, 2, 2, 1, 9], expected: 1219 },
+      { input: [1, 1, 0, 2, 0, 0], expected: 200 },
+      { input: [2, 1, 0], expected: 0 }
+    ],
+    constraints: ["Digits are 0..9", "Return numeric value after removal"],
+    skillKeys: ["dsa.monotonic_stack", "dsa.greedy"]
+  },
+  {
+    slug: "stock-span-total",
+    topic: "Monotonic Stack",
+    difficulty: "MEDIUM",
+    company: "Zerodha",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Stock Span Total",
+    description: "Each value is a daily price. For every day, span is the number of consecutive previous days including today with price <= today. Return the sum of spans.",
+    acceptanceText: "<p><strong>Expected:</strong> Monotonic decreasing stack storing price and accumulated span.</p>",
+    testCases: [
+      { input: [100, 80, 60, 70, 60, 75, 85], expected: 15 },
+      { input: [10, 20, 30], expected: 6 },
+      { input: [30, 20, 10], expected: 3 }
+    ],
+    constraints: ["Return sum of all spans"],
+    skillKeys: ["dsa.monotonic_stack", "dsa.stack"]
+  },
+  {
+    slug: "sliding-window-maximum-sum",
+    topic: "Monotonic Queue",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Sliding Window Maximum Sum",
+    description: "The first number is k. Remaining values are the array. For every contiguous window of length k, compute the maximum. Return the sum of these maximum values.",
+    acceptanceText: "<p><strong>Expected:</strong> Monotonic deque of indices. Remove expired indices and smaller trailing values.</p>",
+    testCases: [
+      { input: [3, 1, 3, -1, -3, 5, 3, 6, 7], expected: 29 },
+      { input: [1, 5], expected: 5 },
+      { input: [4, 1, 2], expected: 0 }
+    ],
+    constraints: ["Return 0 if k is invalid"],
+    skillKeys: ["dsa.monotonic_queue", "dsa.sliding_window"]
+  },
+  {
+    slug: "maximal-rectangle-binary-matrix",
+    topic: "Monotonic Stack",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximal Rectangle Binary Matrix",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened binary matrix. Return the largest all-1 rectangle area.",
+    acceptanceText: "<p><strong>Expected:</strong> Convert each row into histogram heights and apply largest-rectangle-in-histogram per row.</p>",
+    testCases: [
+      { input: [4, 5, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0], expected: 6 },
+      { input: [1, 1, 0], expected: 0 },
+      { input: [1, 1, 1], expected: 1 }
+    ],
+    constraints: ["Matrix values are 0 or 1"],
+    skillKeys: ["dsa.monotonic_stack", "dsa.dynamic_programming"]
+  },
+  {
+    slug: "next-greater-circular-sum",
+    topic: "Monotonic Stack",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Next Greater Circular Sum",
+    description: "For every value in a circular array, find the next greater value. Use 0 if absent. Return the sum of all next greater values.",
+    acceptanceText: "<p><strong>Expected:</strong> Iterate indices twice from right to left with a decreasing stack.</p>",
+    testCases: [
+      { input: [1, 2, 1], expected: 4 },
+      { input: [5, 4, 3], expected: 10 },
+      { input: [2, 2, 2], expected: 0 }
+    ],
+    constraints: ["Array is circular"],
+    skillKeys: ["dsa.monotonic_stack"]
+  },
+  {
+    slug: "sum-subarray-minimums",
+    topic: "Monotonic Stack",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Sum Of Subarray Minimums",
+    description: "Return the sum of the minimum value of every contiguous subarray.",
+    acceptanceText: "<p><strong>Expected:</strong> Use previous-less and next-less-or-equal boundaries to count each value's contribution.</p>",
+    testCases: [
+      { input: [3, 1, 2, 4], expected: 17 },
+      { input: [11, 81, 94, 43, 3], expected: 444 },
+      { input: [1], expected: 1 }
+    ],
+    constraints: ["Discuss modulo if values are large, but test outputs are raw integers"],
+    skillKeys: ["dsa.monotonic_stack"]
   }
 ];
 
