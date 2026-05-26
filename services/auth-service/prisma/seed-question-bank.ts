@@ -1588,58 +1588,9 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
   }
 ];
 
-const drillScenarios = [
-  "Login Risk Stream",
-  "Checkout Load",
-  "Interview Attempt History",
-  "Search Ranking Signals",
-  "Delivery Route Metrics",
-  "Payment Reconciliation",
-  "Leaderboard Activity"
-];
-
-function buildPatternDrills(): CuratedDsaProblem[] {
-  return templates.flatMap((template, templateIndex) =>
-    drillScenarios.map((scenario, scenarioIndex) => {
-      const company = companies[(templateIndex + scenarioIndex) % companies.length];
-      const difficulty = difficultyFor(template, scenarioIndex + templateIndex);
-      const heading = `${template.title}: ${scenario}`;
-      const seed = template.key.length + templateIndex * 17 + scenarioIndex * 7;
-
-      return {
-        slug: `pattern-${template.key}-${slugify(scenario)}`,
-        topic: template.topic,
-        difficulty,
-        company: company.name,
-        companyTags: company.tags,
-        heading,
-        description: [
-          `Solve this ${template.topic.toLowerCase()} pattern using ${scenario.toLowerCase()} as the interview setting.`,
-          template.prompt({
-            index: scenarioIndex,
-            context: scenario.toLowerCase(),
-            company: company.name,
-            companyTags: company.tags,
-            difficulty
-          }),
-          "The wording is product-flavored, but the expected solution should focus on the underlying DSA pattern."
-        ].join("\n"),
-        acceptanceText: `<p><strong>Expected:</strong> ${template.acceptance}</p><p>Also explain complexity, edge cases, and why this pattern fits the data shape.</p>`,
-        testCases: template.cases(seed),
-        constraints: [
-          "0 <= nums.length <= 200000 for the intended solution",
-          "Values fit inside signed 32-bit integer range",
-          "Return exactly one integer"
-        ],
-        skillKeys: template.skillKeys
-      };
-    })
-  );
-}
-
 function buildDsaQuestions() {
   const seen = new Set<string>();
-  const problems = [...curatedDsaProblems, ...buildPatternDrills()].filter((problem) => {
+  const problems = curatedDsaProblems.filter((problem) => {
     const slug = slugify(`prepnexo-dsa-${problem.slug}`);
     if (seen.has(slug)) return false;
     seen.add(slug);
