@@ -37,6 +37,11 @@ function practiceHref(type?: string) {
   return "/coding";
 }
 
+function questionHref(question: { id: string; type?: string }) {
+  if (question.type === "DSA") return `/questions/${question.id}`;
+  return practiceHref(question.type);
+}
+
 export function QuestionLibraryClient() {
   const [page, setPage] = useState(1);
   const [q, setQ] = useState("");
@@ -294,9 +299,7 @@ export function QuestionLibraryClient() {
                   </div>
                 ) : null}
                 <Button asChild>
-                  <Link href={practiceHref(question.type)}>
-                    Practice this type
-                  </Link>
+                  <Link href={questionHref(question)}>Practice question</Link>
                 </Button>
               </CardContent>
             </Card>

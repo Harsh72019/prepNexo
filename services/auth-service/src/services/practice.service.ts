@@ -8,6 +8,7 @@ import type {
 } from "@interview-battlefield/types";
 import { AttemptKind, AttemptStatus, Prisma } from "@prisma/client";
 import { prisma } from "../config/prisma.js";
+import { HttpError } from "../lib/http-error.js";
 import { AdaptiveService } from "./adaptive.service.js";
 import { BillingService } from "./billing.service.js";
 import {
@@ -154,6 +155,17 @@ export class PracticeService {
 
   async listQuestions() {
     return prisma.question.findMany({ orderBy: [{ updatedAt: "desc" }] });
+  }
+
+  async question(userId: string, id: string) {
+    const question = await prisma.question.findFirst({
+      where: { id, status: "ACTIVE" },
+      include: { progress: { where: { userId }, take: 1 } },
+    });
+    if (!question) {
+      throw new HttpError(404, "Question not found", "QUESTION_NOT_FOUND");
+    }
+    return this.toPracticeProblem(question);
   }
 
   async questionLibrary(

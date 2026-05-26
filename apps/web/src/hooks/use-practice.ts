@@ -41,6 +41,19 @@ export function useQuestionLibrary(params: {
   });
 }
 
+export function usePracticeQuestion(id?: string) {
+  const accessToken = useAuthStore((state) => state.accessToken);
+
+  return useQuery({
+    queryKey: ["practice", "question", id],
+    enabled: Boolean(accessToken && id),
+    queryFn: async () => {
+      const response = await practiceApi.question(accessToken!, id!);
+      return response.data;
+    },
+  });
+}
+
 export function useSubmitAttempt() {
   const queryClient = useQueryClient();
   const accessToken = useAuthStore((state) => state.accessToken);

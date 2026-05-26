@@ -19,6 +19,11 @@ router.get(
   authenticate,
   asyncHandler(controller.questionLibrary),
 );
+router.get(
+  "/questions/:id",
+  authenticate,
+  asyncHandler(controller.question),
+);
 router.post(
   "/attempts",
   authenticate,

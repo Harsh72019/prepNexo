@@ -33,6 +33,13 @@ export class PracticeController {
     res.json({ data: library });
   };
 
+  question = async (req: Request, res: Response) => {
+    if (!req.params.id)
+      throw new HttpError(400, "Missing question id", "MISSING_QUESTION_ID");
+    const question = await practice.question(req.user!.id, req.params.id);
+    res.json({ data: question });
+  };
+
   submitAttempt = async (req: Request, res: Response) => {
     const attempt = await practice.submitAttempt(req.user!.id, req.body);
     res.status(201).json({ data: attempt });

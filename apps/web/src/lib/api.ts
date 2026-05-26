@@ -12,6 +12,7 @@ import type {
   OnboardingStatus,
   OverallLeaderboard,
   PracticeCatalog,
+  PracticeProblem,
   PracticeTestCase,
   QuestionLibraryResult,
   PressurePrompt,
@@ -235,6 +236,11 @@ export const practiceApi = {
       { accessToken },
     );
   },
+  question: (accessToken: string, id: string) =>
+    request<ApiResponse<PracticeProblem>>(
+      `/api/practice/questions/${encodeURIComponent(id)}`,
+      { accessToken },
+    ),
   submitAttempt: (accessToken: string, body: SubmitAttemptInput) =>
     request<ApiResponse<{ id: string }>>("/api/practice/attempts", {
       accessToken,
