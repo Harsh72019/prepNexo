@@ -2231,6 +2231,550 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
     ],
     constraints: ["Discuss modulo if values are large, but test outputs are raw integers"],
     skillKeys: ["dsa.monotonic_stack"]
+  },
+  {
+    slug: "first-and-last-position-span",
+    topic: "Binary Search",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "First And Last Position Span",
+    description: "The first number is target. Remaining values are sorted. Return lastIndex - firstIndex + 1 for target, or 0 if target is absent.",
+    acceptanceText: "<p><strong>Expected:</strong> Run lower-bound searches for target and target + 1. Avoid linear scanning after finding one occurrence.</p>",
+    testCases: [
+      { input: [8, 5, 7, 7, 8, 8, 10], expected: 2 },
+      { input: [6, 5, 7, 7, 8, 8, 10], expected: 0 },
+      { input: [1, 1, 1, 1], expected: 3 }
+    ],
+    constraints: ["Remaining values are sorted non-decreasing"],
+    skillKeys: ["dsa.binary_search"]
+  },
+  {
+    slug: "sqrt-floor",
+    topic: "Binary Search",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Integer Square Root Floor",
+    description: "The first number is x. Return floor(sqrt(x)) without using a built-in square root function.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search the answer from 0..x and compare mid <= x / mid to avoid overflow.</p>",
+    testCases: [
+      { input: [4], expected: 2 },
+      { input: [8], expected: 2 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["0 <= x <= 2147483647"],
+    skillKeys: ["dsa.binary_search"]
+  },
+  {
+    slug: "peak-element-index",
+    topic: "Binary Search",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Peak Element Index",
+    description: "Return any peak index where nums[i] is greater than its neighbors. For deterministic scoring, return the peak found by the standard binary-search rule that moves right when nums[mid] < nums[mid + 1].",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search on the slope. This works because a peak must exist in the direction of increasing slope.</p>",
+    testCases: [
+      { input: [1, 2, 3, 1], expected: 2 },
+      { input: [1, 2, 1, 3, 5, 6, 4], expected: 5 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["Use virtual -infinity outside array bounds"],
+    skillKeys: ["dsa.binary_search"]
+  },
+  {
+    slug: "find-min-rotated-sorted",
+    topic: "Binary Search",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Find Minimum In Rotated Sorted Array",
+    description: "The array is a rotated sorted array with distinct values. Return the minimum value.",
+    acceptanceText: "<p><strong>Expected:</strong> Compare mid with right boundary to decide which half contains the minimum.</p>",
+    testCases: [
+      { input: [3, 4, 5, 1, 2], expected: 1 },
+      { input: [4, 5, 6, 7, 0, 1, 2], expected: 0 },
+      { input: [11, 13, 15, 17], expected: 11 }
+    ],
+    constraints: ["Values are distinct"],
+    skillKeys: ["dsa.binary_search"]
+  },
+  {
+    slug: "aggressive-cows-distance",
+    topic: "Binary Search",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Aggressive Cows Maximum Distance",
+    description: "The first number is k cows. Remaining values are stall positions. Return the largest minimum distance possible between any two placed cows.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort positions, binary search distance, and greedily test if k cows can be placed.</p>",
+    testCases: [
+      { input: [3, 1, 2, 4, 8, 9], expected: 3 },
+      { input: [2, 5, 4, 3, 2, 1], expected: 4 },
+      { input: [4, 1, 2, 3], expected: 0 }
+    ],
+    constraints: ["First value is k", "Return 0 when placement is impossible"],
+    skillKeys: ["dsa.binary_search", "dsa.greedy"]
+  },
+  {
+    slug: "split-array-largest-sum",
+    topic: "Binary Search",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Split Array Largest Sum",
+    description: "The first number is k. Split the remaining array into k non-empty contiguous parts. Return the minimized largest part sum.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search answer from max element to total sum and greedily count partitions.</p>",
+    testCases: [
+      { input: [2, 7, 2, 5, 10, 8], expected: 18 },
+      { input: [2, 1, 2, 3, 4, 5], expected: 9 },
+      { input: [1, 3, 2, 2], expected: 7 }
+    ],
+    constraints: ["All values after k are non-negative"],
+    skillKeys: ["dsa.binary_search", "dsa.greedy"]
+  },
+  {
+    slug: "minimum-days-bouquets",
+    topic: "Binary Search",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Days For Bouquets",
+    description: "The first two numbers are m bouquets and k adjacent flowers per bouquet. Remaining values are bloom days. Return the minimum day to make m bouquets, or -1.",
+    acceptanceText: "<p><strong>Expected:</strong> Binary search day and greedily count consecutive bloomed flowers.</p>",
+    testCases: [
+      { input: [3, 1, 1, 10, 3, 10, 2], expected: 3 },
+      { input: [3, 2, 1, 10, 3, 10, 2], expected: -1 },
+      { input: [2, 2, 7, 7, 7, 7, 12, 7, 7], expected: 12 }
+    ],
+    constraints: ["Bouquets require adjacent flowers"],
+    skillKeys: ["dsa.binary_search"]
+  },
+  {
+    slug: "gas-station-start-index",
+    topic: "Greedy",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Gas Station Start Index",
+    description: "The first number is n. The next n values are gas amounts and the following n values are costs. Return the starting station index that completes the circuit, or -1.",
+    acceptanceText: "<p><strong>Expected:</strong> If total gas is less than total cost return -1. Otherwise reset start whenever current tank drops below zero.</p>",
+    testCases: [
+      { input: [5, 1, 2, 3, 4, 5, 3, 4, 5, 1, 2], expected: 3 },
+      { input: [3, 2, 3, 4, 3, 4, 3], expected: -1 },
+      { input: [1, 5, 4], expected: 0 }
+    ],
+    constraints: ["First value is n"],
+    skillKeys: ["dsa.greedy"]
+  },
+  {
+    slug: "jump-game-reachable",
+    topic: "Greedy",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Jump Game Reachable",
+    description: "Each value is the maximum jump length from that index. Return 1 if the last index is reachable, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Track the farthest reachable index while scanning. Stop when index exceeds reach.</p>",
+    testCases: [
+      { input: [2, 3, 1, 1, 4], expected: 1 },
+      { input: [3, 2, 1, 0, 4], expected: 0 },
+      { input: [0], expected: 1 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.greedy"]
+  },
+  {
+    slug: "jump-game-min-jumps",
+    topic: "Greedy",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Jump Game Minimum Jumps",
+    description: "Each value is the maximum jump length from that index. Return the minimum number of jumps needed to reach the last index, or -1 if impossible.",
+    acceptanceText: "<p><strong>Expected:</strong> Greedy BFS-level window using currentEnd and farthest reach.</p>",
+    testCases: [
+      { input: [2, 3, 1, 1, 4], expected: 2 },
+      { input: [2, 3, 0, 1, 4], expected: 2 },
+      { input: [0, 1], expected: -1 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.greedy"]
+  },
+  {
+    slug: "candy-distribution-total",
+    topic: "Greedy",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Candy Distribution Total",
+    description: "Each value is a child rating. Every child needs at least one candy, and higher rated children than an adjacent neighbor need more candy. Return the minimum total candies.",
+    acceptanceText: "<p><strong>Expected:</strong> Two passes, left-to-right and right-to-left, taking max constraints at each index.</p>",
+    testCases: [
+      { input: [1, 0, 2], expected: 5 },
+      { input: [1, 2, 2], expected: 4 },
+      { input: [1, 3, 4, 5, 2], expected: 11 }
+    ],
+    constraints: ["Adjacent rating rule only"],
+    skillKeys: ["dsa.greedy"]
+  },
+  {
+    slug: "lemonade-change-possible",
+    topic: "Greedy",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Lemonade Change Possible",
+    description: "Each value is a customer bill: 5, 10, or 20. Lemonade costs 5. Return 1 if you can provide correct change to every customer in order, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Greedily use a 10 and 5 for a 20 bill when possible, otherwise three 5 bills.</p>",
+    testCases: [
+      { input: [5, 5, 5, 10, 20], expected: 1 },
+      { input: [5, 5, 10, 10, 20], expected: 0 },
+      { input: [10], expected: 0 }
+    ],
+    constraints: ["Bills are processed in order"],
+    skillKeys: ["dsa.greedy"]
+  },
+  {
+    slug: "assign-cookies-content-count",
+    topic: "Greedy",
+    difficulty: "EASY",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Assign Cookies Content Count",
+    description: "The first number is n. The next n values are child greed factors. Remaining values are cookie sizes. Return the maximum number of content children.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort greed and cookies, then greedily assign the smallest cookie that satisfies each child.</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 1, 1], expected: 1 },
+      { input: [2, 1, 2, 1, 2, 3], expected: 2 },
+      { input: [0, 1, 2], expected: 0 }
+    ],
+    constraints: ["First value is number of children"],
+    skillKeys: ["dsa.greedy", "dsa.sorting"]
+  },
+  {
+    slug: "non-overlapping-intervals-remove",
+    topic: "Intervals",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Non Overlapping Intervals Remove Count",
+    description: "Values are encoded as start,end pairs. Return the minimum number of intervals to remove so the rest do not overlap.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort by end time and greedily keep intervals that start after the last kept end.</p>",
+    testCases: [
+      { input: [1, 2, 2, 3, 3, 4, 1, 3], expected: 1 },
+      { input: [1, 2, 1, 2, 1, 2], expected: 2 },
+      { input: [1, 2, 2, 3], expected: 0 }
+    ],
+    constraints: ["Ignore incomplete trailing endpoint"],
+    skillKeys: ["dsa.intervals", "dsa.greedy"]
+  },
+  {
+    slug: "insert-interval-coverage",
+    topic: "Intervals",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Insert Interval Coverage",
+    description: "The first two numbers are the new interval start and end. Remaining values are sorted non-overlapping intervals encoded as pairs. Insert and merge, then return total covered length.",
+    acceptanceText: "<p><strong>Expected:</strong> Add intervals before new, merge overlaps with new, then append the rest.</p>",
+    testCases: [
+      { input: [2, 5, 1, 3, 6, 9], expected: 7 },
+      { input: [4, 8, 1, 2, 3, 5, 6, 7, 8, 10], expected: 8 },
+      { input: [1, 2], expected: 1 }
+    ],
+    constraints: ["Intervals are half-open for length end - start"],
+    skillKeys: ["dsa.intervals"]
+  },
+  {
+    slug: "minimum-arrows-balloons",
+    topic: "Intervals",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Arrows For Balloons",
+    description: "Values are encoded as start,end balloon intervals. One arrow at position x bursts all balloons where start <= x <= end. Return the minimum arrows needed.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort by end and shoot a new arrow only when the next start is greater than current arrow position.</p>",
+    testCases: [
+      { input: [10, 16, 2, 8, 1, 6, 7, 12], expected: 2 },
+      { input: [1, 2, 3, 4, 5, 6, 7, 8], expected: 4 },
+      { input: [1, 2, 2, 3], expected: 1 }
+    ],
+    constraints: ["Intervals are closed for overlap checks"],
+    skillKeys: ["dsa.intervals", "dsa.greedy"]
+  },
+  {
+    slug: "employee-free-time-count",
+    topic: "Intervals",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Employee Free Time Count",
+    description: "Values are busy intervals encoded as start,end pairs for all employees combined. Merge busy intervals and return the number of positive free gaps between them.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort all intervals, merge busy ranges, and count gaps between merged ranges.</p>",
+    testCases: [
+      { input: [1, 3, 6, 7, 2, 4, 8, 10], expected: 2 },
+      { input: [1, 5, 2, 3], expected: 0 },
+      { input: [1, 2], expected: 0 }
+    ],
+    constraints: ["Ignore incomplete trailing endpoint"],
+    skillKeys: ["dsa.intervals", "dsa.sorting"]
+  },
+  {
+    slug: "top-k-largest-sum",
+    topic: "Heaps",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Top K Largest Sum",
+    description: "The first number is k. Return the sum of the k largest values from the remaining array.",
+    acceptanceText: "<p><strong>Expected:</strong> Min-heap of size k for streaming constraints, or sort for simpler baseline.</p>",
+    testCases: [
+      { input: [3, 5, 1, 9, 2, 8], expected: 22 },
+      { input: [5, 1, 2], expected: 3 },
+      { input: [0, 1, 2], expected: 0 }
+    ],
+    constraints: ["If k > n, sum all values"],
+    skillKeys: ["dsa.heaps", "dsa.sorting"]
+  },
+  {
+    slug: "kth-largest-value",
+    topic: "Heaps",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Kth Largest Value",
+    description: "The first number is k. Return the kth largest value from the remaining array. Duplicates count as separate positions.",
+    acceptanceText: "<p><strong>Expected:</strong> Min-heap of size k or quickselect. Clarify duplicate handling.</p>",
+    testCases: [
+      { input: [2, 3, 2, 1, 5, 6, 4], expected: 5 },
+      { input: [4, 3, 2, 3, 1, 2, 4, 5, 5, 6], expected: 4 },
+      { input: [1, 7], expected: 7 }
+    ],
+    constraints: ["1 <= k <= n"],
+    skillKeys: ["dsa.heaps", "dsa.quickselect"]
+  },
+  {
+    slug: "merge-k-sorted-lists-checksum",
+    topic: "Heaps",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Merge K Sorted Lists Checksum",
+    description: "Sorted lists are encoded with 0 as a separator. Merge all lists and return sum(index * value) of the merged result.",
+    acceptanceText: "<p><strong>Expected:</strong> Min-heap containing the current head from each list. Pop smallest and advance that list.</p>",
+    testCases: [
+      { input: [1, 4, 5, 0, 1, 3, 4, 0, 2, 6], expected: 122 },
+      { input: [1, 0, 2, 0, 3], expected: 8 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["0 separates lists and is not a list value"],
+    skillKeys: ["dsa.heaps"]
+  },
+  {
+    slug: "k-closest-points-distance-sum",
+    topic: "Heaps",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "K Closest Points Distance Sum",
+    description: "The first number is k. Remaining values are x,y point pairs. Return the sum of squared distances of the k closest points to origin.",
+    acceptanceText: "<p><strong>Expected:</strong> Max-heap of size k or quickselect on squared distance. Ignore incomplete trailing coordinate.</p>",
+    testCases: [
+      { input: [1, 1, 3, -2, 2], expected: 8 },
+      { input: [2, 3, 3, 5, -1, -2, 4], expected: 30 },
+      { input: [3, 1, 1], expected: 2 }
+    ],
+    constraints: ["Distance is x*x + y*y"],
+    skillKeys: ["dsa.heaps", "dsa.quickselect"]
+  },
+  {
+    slug: "task-scheduler-min-intervals",
+    topic: "Heaps",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Task Scheduler Minimum Intervals",
+    description: "The first number is cooldown n. Remaining values are task IDs. Return the minimum time units needed to execute all tasks with the cooldown rule.",
+    acceptanceText: "<p><strong>Expected:</strong> Use frequency math or max-heap simulation. The most frequent task determines idle slots.</p>",
+    testCases: [
+      { input: [2, 1, 1, 1, 2, 2, 2], expected: 8 },
+      { input: [0, 1, 1, 2], expected: 3 },
+      { input: [2, 1, 2, 3], expected: 3 }
+    ],
+    constraints: ["Same task IDs need n intervals between runs"],
+    skillKeys: ["dsa.heaps", "dsa.greedy"]
+  },
+  {
+    slug: "sort-array-inversion-parity",
+    topic: "Sorting",
+    difficulty: "MEDIUM",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Sort Array Inversion Parity",
+    description: "Return 1 if the inversion count of the array is odd, otherwise return 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Merge-sort inversion counting. For parity, toggling during merge is enough.</p>",
+    testCases: [
+      { input: [2, 1, 3], expected: 1 },
+      { input: [3, 2, 1], expected: 1 },
+      { input: [1, 2, 3], expected: 0 }
+    ],
+    constraints: ["Inversion is i < j and nums[i] > nums[j]"],
+    skillKeys: ["dsa.sorting", "dsa.divide_and_conquer"]
+  },
+  {
+    slug: "relative-sort-checksum",
+    topic: "Sorting",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Relative Sort Checksum",
+    description: "The first number is m. The next m values define priority order. Sort the remaining values by that priority first, then ascending for unmentioned values. Return sum(index * value).",
+    acceptanceText: "<p><strong>Expected:</strong> Frequency map plus output in priority order, then remaining sorted keys.</p>",
+    testCases: [
+      { input: [3, 2, 1, 4, 2, 3, 1, 4, 2, 5], expected: 53 },
+      { input: [2, 5, 1, 1, 5, 2], expected: 5 },
+      { input: [0, 3, 1, 2], expected: 8 }
+    ],
+    constraints: ["First value is priority length"],
+    skillKeys: ["dsa.sorting", "dsa.hashing"]
+  },
+  {
+    slug: "wiggle-sort-peak-count",
+    topic: "Sorting",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Wiggle Sort Peak Count",
+    description: "Rearrange values into wiggle order nums[0] <= nums[1] >= nums[2] <= nums[3]... using the one-pass local swap method. Return the number of odd indices that are peaks after rearrangement.",
+    acceptanceText: "<p><strong>Expected:</strong> One pass swapping adjacent values whenever the current relation is violated.</p>",
+    testCases: [
+      { input: [3, 5, 2, 1, 6, 4], expected: 3 },
+      { input: [1, 2, 3, 4], expected: 2 },
+      { input: [1], expected: 0 }
+    ],
+    constraints: ["Use the standard local swap wiggle algorithm"],
+    skillKeys: ["dsa.sorting", "dsa.greedy"]
+  },
+  {
+    slug: "diagonal-traverse-checksum",
+    topic: "Matrix",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Diagonal Traverse Checksum",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened matrix. Traverse using the classic zig-zag diagonal order and return sum(position * value).",
+    acceptanceText: "<p><strong>Expected:</strong> Iterate diagonals by r + c and reverse every alternate diagonal.</p>",
+    testCases: [
+      { input: [3, 3, 1, 2, 3, 4, 5, 6, 7, 8, 9], expected: 230 },
+      { input: [2, 2, 1, 2, 3, 4], expected: 20 },
+      { input: [0, 0], expected: 0 }
+    ],
+    constraints: ["Matrix is flattened row-major"],
+    skillKeys: ["dsa.matrix", "dsa.arrays"]
+  },
+  {
+    slug: "rotate-matrix-main-diagonal-sum",
+    topic: "Matrix",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Rotate Matrix Main Diagonal Sum",
+    description: "The first number is n. Remaining values form an n x n matrix. Rotate it 90 degrees clockwise and return the main diagonal sum after rotation.",
+    acceptanceText: "<p><strong>Expected:</strong> Transpose then reverse each row, or map coordinates directly.</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 4, 5, 6, 7, 8, 9], expected: 15 },
+      { input: [2, 1, 2, 3, 4], expected: 5 },
+      { input: [1, 7], expected: 7 }
+    ],
+    constraints: ["Matrix is square"],
+    skillKeys: ["dsa.matrix"]
+  },
+  {
+    slug: "search-2d-matrix-found",
+    topic: "Matrix",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Search 2D Matrix Found",
+    description: "The first three numbers are target, rows, and cols. Remaining values are a row-major matrix where each row is sorted and each row starts after the previous row. Return 1 if target exists.",
+    acceptanceText: "<p><strong>Expected:</strong> Treat the matrix as a flattened sorted array and binary search over 0..rows*cols-1.</p>",
+    testCases: [
+      { input: [3, 3, 4, 1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 60], expected: 1 },
+      { input: [13, 3, 4, 1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 60], expected: 0 },
+      { input: [1, 0, 0], expected: 0 }
+    ],
+    constraints: ["Matrix is globally sorted in row-major order"],
+    skillKeys: ["dsa.matrix", "dsa.binary_search"]
+  },
+  {
+    slug: "matrix-block-sum-total",
+    topic: "Matrix",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Matrix Block Sum Total",
+    description: "The first three numbers are k, rows, and cols. Remaining values form a matrix. For every cell, compute the sum of all cells within k Manhattan-style row/col distance as a square block. Return the total of all block sums.",
+    acceptanceText: "<p><strong>Expected:</strong> 2D prefix sums to answer each block in O(1).</p>",
+    testCases: [
+      { input: [1, 3, 3, 1, 2, 3, 4, 5, 6, 7, 8, 9], expected: 245 },
+      { input: [0, 2, 2, 1, 2, 3, 4], expected: 10 },
+      { input: [2, 1, 1, 5], expected: 5 }
+    ],
+    constraints: ["Block is bounded by matrix edges"],
+    skillKeys: ["dsa.matrix", "dsa.prefix_sums"]
+  },
+  {
+    slug: "kth-smallest-sorted-matrix",
+    topic: "Matrix",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Kth Smallest In Sorted Matrix",
+    description: "The first two numbers are k and n. Remaining values form an n x n matrix sorted ascending by rows and columns. Return the kth smallest value.",
+    acceptanceText: "<p><strong>Expected:</strong> Min-heap over row heads or binary search value space with count <= mid.</p>",
+    testCases: [
+      { input: [8, 3, 1, 5, 9, 10, 11, 13, 12, 13, 15], expected: 13 },
+      { input: [1, 1, -5], expected: -5 },
+      { input: [3, 2, 1, 2, 1, 3], expected: 2 }
+    ],
+    constraints: ["Rows and columns are sorted"],
+    skillKeys: ["dsa.matrix", "dsa.heaps", "dsa.binary_search"]
+  },
+  {
+    slug: "min-cost-climbing-greedy-trap",
+    topic: "Dynamic Programming",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Min Cost Climbing Stairs",
+    description: "Each value is the cost of stepping on that stair. You can climb 1 or 2 steps and may start at index 0 or 1. Return the minimum cost to reach the top beyond the last stair.",
+    acceptanceText: "<p><strong>Expected:</strong> Simple rolling DP. The title calls out that local greedy choice is a trap.</p>",
+    testCases: [
+      { input: [10, 15, 20], expected: 15 },
+      { input: [1, 100, 1, 1, 1, 100, 1, 1, 100, 1], expected: 6 },
+      { input: [5], expected: 0 }
+    ],
+    constraints: ["Can start at stair 0 or 1"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "minimum-platforms-required",
+    topic: "Sorting",
+    difficulty: "MEDIUM",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Minimum Platforms Required",
+    description: "The first number is n. The next n values are arrival times and the following n values are departure times. Return the minimum number of platforms required.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort arrivals and departures separately, then sweep with two pointers.</p>",
+    testCases: [
+      { input: [6, 900, 940, 950, 1100, 1500, 1800, 910, 1200, 1120, 1130, 1900, 2000], expected: 3 },
+      { input: [3, 900, 940, 950, 910, 1200, 1120], expected: 2 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["First value is n"],
+    skillKeys: ["dsa.sorting", "dsa.two_pointers"]
   }
 ];
 
