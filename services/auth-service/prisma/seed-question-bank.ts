@@ -2775,6 +2775,652 @@ const curatedDsaProblems: CuratedDsaProblem[] = [
     ],
     constraints: ["First value is n"],
     skillKeys: ["dsa.sorting", "dsa.two_pointers"]
+  },
+  {
+    slug: "unique-paths-grid",
+    topic: "Dynamic Programming",
+    difficulty: "EASY",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Unique Paths Grid",
+    description: "The first two numbers are rows and cols. You can move only right or down from top-left to bottom-right. Return the number of unique paths.",
+    acceptanceText: "<p><strong>Expected:</strong> Grid DP or combinatorics. Handle zero-sized grids.</p>",
+    testCases: [
+      { input: [3, 7], expected: 28 },
+      { input: [3, 2], expected: 3 },
+      { input: [0, 5], expected: 0 }
+    ],
+    constraints: ["Moves allowed: right and down"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
+  },
+  {
+    slug: "unique-paths-with-obstacles",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Unique Paths With Obstacles",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened grid where 1 is blocked and 0 is open. Return the number of paths from top-left to bottom-right moving only right or down.",
+    acceptanceText: "<p><strong>Expected:</strong> DP where blocked cells contribute 0 paths. First row/column initialization is the common pitfall.</p>",
+    testCases: [
+      { input: [3, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0], expected: 2 },
+      { input: [2, 2, 0, 1, 0, 0], expected: 1 },
+      { input: [1, 1, 1], expected: 0 }
+    ],
+    constraints: ["1 means blocked", "Move only right or down"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
+  },
+  {
+    slug: "minimum-path-sum-grid",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Path Sum Grid",
+    description: "The first two numbers are rows and cols. Remaining values are non-negative grid costs. Return the minimum path sum from top-left to bottom-right moving only right or down.",
+    acceptanceText: "<p><strong>Expected:</strong> In-place or rolling-row grid DP taking min from top or left.</p>",
+    testCases: [
+      { input: [3, 3, 1, 3, 1, 1, 5, 1, 4, 2, 1], expected: 7 },
+      { input: [2, 3, 1, 2, 3, 4, 5, 6], expected: 12 },
+      { input: [1, 1, 5], expected: 5 }
+    ],
+    constraints: ["Move only right or down"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
+  },
+  {
+    slug: "triangle-minimum-path",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Triangle Minimum Path",
+    description: "The first number is rows. Remaining values encode a triangle row by row. Return the minimum path sum from top to bottom, moving to adjacent values on the next row.",
+    acceptanceText: "<p><strong>Expected:</strong> Bottom-up DP compressing into one row. Adjacent transition is from index j to j or j + 1.</p>",
+    testCases: [
+      { input: [4, 2, 3, 4, 6, 5, 7, 4, 1, 8, 3], expected: 11 },
+      { input: [1, -10], expected: -10 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Triangle has rows*(rows+1)/2 values"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "minimum-falling-path-sum",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Netflix",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Falling Path Sum",
+    description: "The first number is n. Remaining values form an n x n matrix. Starting from any top-row cell, each step may go down-left, down, or down-right. Return the minimum falling path sum.",
+    acceptanceText: "<p><strong>Expected:</strong> Row-by-row DP with three possible parents from the previous row.</p>",
+    testCases: [
+      { input: [3, 2, 1, 3, 6, 5, 4, 7, 8, 9], expected: 13 },
+      { input: [2, -19, 57, -40, -5], expected: -59 },
+      { input: [1, 7], expected: 7 }
+    ],
+    constraints: ["Matrix is square"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
+  },
+  {
+    slug: "gold-mine-maximum",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Gold Mine Maximum",
+    description: "The first two numbers are rows and cols. Remaining values are gold amounts. Starting from any row in the first column, move right-up, right, or right-down. Return maximum collectable gold.",
+    acceptanceText: "<p><strong>Expected:</strong> DP from right to left or left to right over allowed diagonal transitions.</p>",
+    testCases: [
+      { input: [3, 3, 1, 3, 3, 2, 1, 4, 0, 6, 4], expected: 12 },
+      { input: [1, 4, 1, 2, 3, 4], expected: 10 },
+      { input: [0, 0], expected: 0 }
+    ],
+    constraints: ["Start from any row in column 0"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
+  },
+  {
+    slug: "climb-stairs-variable",
+    topic: "Dynamic Programming",
+    difficulty: "EASY",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Climb Stairs Variable Steps",
+    description: "The first number is n. The second number is maxStep. Return the number of ways to climb exactly n stairs taking between 1 and maxStep stairs each move.",
+    acceptanceText: "<p><strong>Expected:</strong> DP over stair count. Prefix-sum optimization is a good follow-up.</p>",
+    testCases: [
+      { input: [4, 2], expected: 5 },
+      { input: [5, 3], expected: 13 },
+      { input: [0, 3], expected: 1 }
+    ],
+    constraints: ["Order of steps matters"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "perfect-squares-min-count",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Perfect Squares Minimum Count",
+    description: "The first number is n. Return the minimum number of perfect square numbers that sum to n.",
+    acceptanceText: "<p><strong>Expected:</strong> Unbounded DP over square numbers up to sqrt(n), or BFS by remainder as an alternative.</p>",
+    testCases: [
+      { input: [12], expected: 3 },
+      { input: [13], expected: 2 },
+      { input: [1], expected: 1 }
+    ],
+    constraints: ["1 <= n <= 10000"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "combination-sum-count",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Combination Sum Count",
+    description: "The first number is target. Remaining positive values are distinct choices. Return the number of ordered combinations that sum to target.",
+    acceptanceText: "<p><strong>Expected:</strong> DP by amount where dp[amount] sums dp[amount - choice]. Order matters because combinations are sequences here.</p>",
+    testCases: [
+      { input: [4, 1, 2, 3], expected: 7 },
+      { input: [3, 2], expected: 0 },
+      { input: [0, 1, 2], expected: 1 }
+    ],
+    constraints: ["Order matters"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "target-sum-ways",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Target Sum Ways",
+    description: "The first number is target. For every remaining value, choose either +value or -value. Return the number of assignments that evaluate to target.",
+    acceptanceText: "<p><strong>Expected:</strong> Transform to subset sum or use map-based DP over reachable sums.</p>",
+    testCases: [
+      { input: [3, 1, 1, 1, 1, 1], expected: 5 },
+      { input: [1, 1], expected: 1 },
+      { input: [2, 1], expected: 0 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "zero-one-knapsack-max-value",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Zero One Knapsack Max Value",
+    description: "Input is capacity, itemCount, then itemCount weights, then itemCount values. Return the maximum value using each item at most once.",
+    acceptanceText: "<p><strong>Expected:</strong> 1D DP iterating capacity downward for each item.</p>",
+    testCases: [
+      { input: [7, 4, 1, 3, 4, 5, 1, 4, 5, 7], expected: 9 },
+      { input: [4, 3, 4, 5, 1, 10, 20, 2], expected: 10 },
+      { input: [0, 2, 1, 2, 5, 6], expected: 0 }
+    ],
+    constraints: ["Each item can be used once"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.knapsack"]
+  },
+  {
+    slug: "unbounded-knapsack-max-value",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Adobe",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Unbounded Knapsack Max Value",
+    description: "Input is capacity, itemCount, then itemCount weights, then itemCount values. Return the maximum value when each item can be used unlimited times.",
+    acceptanceText: "<p><strong>Expected:</strong> 1D DP iterating capacity upward so the same item can contribute multiple times.</p>",
+    testCases: [
+      { input: [8, 2, 2, 3, 5, 7], expected: 20 },
+      { input: [5, 2, 4, 2, 10, 4], expected: 10 },
+      { input: [0, 1, 2, 5], expected: 0 }
+    ],
+    constraints: ["Items can be reused unlimited times"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.knapsack"]
+  },
+  {
+    slug: "subset-sum-possible",
+    topic: "Dynamic Programming",
+    difficulty: "EASY",
+    company: "Infosys",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Subset Sum Possible",
+    description: "The first number is target. Remaining non-negative values form the array. Return 1 if any subset sums exactly to target, otherwise 0.",
+    acceptanceText: "<p><strong>Expected:</strong> Boolean DP over sums, iterating sums downward for each value.</p>",
+    testCases: [
+      { input: [9, 3, 34, 4, 12, 5, 2], expected: 1 },
+      { input: [30, 3, 34, 4, 12, 5, 2], expected: 0 },
+      { input: [0, 5], expected: 1 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.knapsack"]
+  },
+  {
+    slug: "count-subsets-with-sum",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Count Subsets With Sum",
+    description: "The first number is target. Remaining non-negative values form the array. Return the number of subsets whose sum equals target.",
+    acceptanceText: "<p><strong>Expected:</strong> Count DP over sums, iterating downward for each item. Zero values double existing counts.</p>",
+    testCases: [
+      { input: [10, 2, 3, 5, 6, 8, 10], expected: 3 },
+      { input: [0, 0, 0], expected: 4 },
+      { input: [5, 1, 2], expected: 0 }
+    ],
+    constraints: ["Count subsets by index, not by distinct values"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.knapsack"]
+  },
+  {
+    slug: "minimum-subset-sum-difference",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Minimum Subset Sum Difference",
+    description: "Partition the array into two subsets. Return the minimum possible absolute difference between subset sums.",
+    acceptanceText: "<p><strong>Expected:</strong> Subset-sum reachability up to total/2, then choose the closest reachable sum.</p>",
+    testCases: [
+      { input: [1, 6, 11, 5], expected: 1 },
+      { input: [3, 1, 4, 2, 2], expected: 0 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Values are non-negative"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.knapsack"]
+  },
+  {
+    slug: "rod-cutting-max-profit",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Wipro",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Rod Cutting Max Profit",
+    description: "The first number is rod length n. The next n values are prices for lengths 1..n. Return the maximum obtainable value by cutting the rod.",
+    acceptanceText: "<p><strong>Expected:</strong> Unbounded knapsack where each cut length can be used repeatedly.</p>",
+    testCases: [
+      { input: [8, 1, 5, 8, 9, 10, 17, 17, 20], expected: 22 },
+      { input: [4, 2, 5, 7, 8], expected: 10 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Prices are for lengths 1 through n"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.knapsack"]
+  },
+  {
+    slug: "longest-common-subsequence-length",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Common Subsequence Length",
+    description: "The first number is split index. Values before split form sequence A and values after split form sequence B. Return the LCS length.",
+    acceptanceText: "<p><strong>Expected:</strong> 2D DP over prefixes, with match advancing both sequences and mismatch taking max of dropping one side.</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 2, 1, 3], expected: 2 },
+      { input: [3, 1, 2, 3, 1, 2, 3], expected: 3 },
+      { input: [0, 1, 2], expected: 0 }
+    ],
+    constraints: ["First value is length of sequence A"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "shortest-common-supersequence-length",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Shortest Common Supersequence Length",
+    description: "The first number is split index. Values before split form A and values after split form B. Return the length of the shortest sequence containing both as subsequences.",
+    acceptanceText: "<p><strong>Expected:</strong> Use len(A) + len(B) - LCS(A, B).</p>",
+    testCases: [
+      { input: [3, 1, 2, 3, 2, 1, 3], expected: 4 },
+      { input: [2, 1, 1, 1, 1], expected: 2 },
+      { input: [0, 5, 6], expected: 2 }
+    ],
+    constraints: ["First value is length of A"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "distinct-subsequences-count",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Distinct Subsequences Count",
+    description: "The first number is split index. Values before split form source and values after split form target. Return how many subsequences of source equal target.",
+    acceptanceText: "<p><strong>Expected:</strong> DP over source/target prefixes. Iterate target backward for a 1D optimization.</p>",
+    testCases: [
+      { input: [7, 1, 2, 1, 1, 2, 1, 3, 1, 1, 3], expected: 3 },
+      { input: [5, 1, 1, 1, 1, 1, 1, 1], expected: 10 },
+      { input: [0, 1], expected: 0 }
+    ],
+    constraints: ["Count subsequences by index choices"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "minimum-insertions-palindrome",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Insertions To Palindrome",
+    description: "Values represent a sequence. Return the minimum number of insertions required to make it a palindrome.",
+    acceptanceText: "<p><strong>Expected:</strong> n - longest palindromic subsequence length, or direct interval DP.</p>",
+    testCases: [
+      { input: [1, 2, 3, 2, 1], expected: 0 },
+      { input: [1, 2, 3], expected: 2 },
+      { input: [1, 2, 1, 3], expected: 1 }
+    ],
+    constraints: ["Insertions can happen anywhere"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "palindromic-substrings-count",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Palindromic Substrings Count",
+    description: "Values represent characters. Return the number of contiguous substrings that are palindromes.",
+    acceptanceText: "<p><strong>Expected:</strong> Expand around centers or DP over intervals. Count both odd and even length palindromes.</p>",
+    testCases: [
+      { input: [1, 1, 1], expected: 6 },
+      { input: [1, 2, 3], expected: 3 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Substring is contiguous"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "regular-expression-match-lite",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Regular Expression Match Lite",
+    description: "The first number is split index. Values before split form text. Values after split form pattern where -1 means '.' and -2 means '*'. Return 1 if the whole text matches the pattern.",
+    acceptanceText: "<p><strong>Expected:</strong> 2D DP for full-string regex matching with dot and star. Star applies to the previous pattern token.</p>",
+    testCases: [
+      { input: [2, 1, 1, 1, -2], expected: 1 },
+      { input: [1, 1, -1], expected: 1 },
+      { input: [2, 1, 2, 1], expected: 0 }
+    ],
+    constraints: ["Pattern tokens -1='.' and -2='*'"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "wildcard-match-lite",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Wildcard Match Lite",
+    description: "The first number is split index. Values before split form text. Values after split form pattern where -1 means '?' and -2 means '*'. Return 1 if the whole text matches.",
+    acceptanceText: "<p><strong>Expected:</strong> DP where '?' consumes one token and '*' can consume zero or more tokens.</p>",
+    testCases: [
+      { input: [2, 1, 2, 1, -2], expected: 1 },
+      { input: [2, 1, 2, 1, -1], expected: 1 },
+      { input: [2, 1, 2, 2], expected: 0 }
+    ],
+    constraints: ["Pattern tokens -1='?' and -2='*'"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.strings"]
+  },
+  {
+    slug: "stock-profit-two-transactions",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Zerodha",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Stock Profit Two Transactions",
+    description: "Each value is a stock price. Return the maximum profit with at most two buy-sell transactions. You cannot hold more than one stock at a time.",
+    acceptanceText: "<p><strong>Expected:</strong> Four-state DP: buy1, sell1, buy2, sell2; or prefix/suffix best profits.</p>",
+    testCases: [
+      { input: [3, 3, 5, 0, 0, 3, 1, 4], expected: 6 },
+      { input: [1, 2, 3, 4, 5], expected: 4 },
+      { input: [7, 6, 4, 3, 1], expected: 0 }
+    ],
+    constraints: ["At most two complete transactions"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "stock-profit-transaction-fee",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Razorpay",
+    companyTags: ["STARTUP", "PRODUCT_BASED"],
+    heading: "Stock Profit With Transaction Fee",
+    description: "The first number is fee. Remaining values are stock prices. Return the maximum profit with unlimited transactions, paying fee on each sell.",
+    acceptanceText: "<p><strong>Expected:</strong> Hold/cash DP states. Pay the fee when selling or buying, but be consistent.</p>",
+    testCases: [
+      { input: [2, 1, 3, 2, 8, 4, 9], expected: 8 },
+      { input: [3, 1, 3, 7, 5, 10, 3], expected: 6 },
+      { input: [1, 5], expected: 0 }
+    ],
+    constraints: ["One stock max at a time"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "best-time-buy-sell-k-transactions",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Stock Profit K Transactions",
+    description: "The first number is k. Remaining values are prices. Return maximum profit using at most k transactions.",
+    acceptanceText: "<p><strong>Expected:</strong> DP over transaction count and holding state. Optimize large k to unlimited-transactions greedy.</p>",
+    testCases: [
+      { input: [2, 2, 4, 1], expected: 2 },
+      { input: [2, 3, 2, 6, 5, 0, 3], expected: 7 },
+      { input: [0, 1, 2, 3], expected: 0 }
+    ],
+    constraints: ["First value is transaction limit k"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "burst-balloons-max-coins",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Burst Balloons Max Coins",
+    description: "Each value is a balloon. Bursting balloon i earns left * nums[i] * right using nearest remaining neighbors, with virtual 1s outside. Return maximum coins.",
+    acceptanceText: "<p><strong>Expected:</strong> Interval DP choosing the last balloon burst inside each interval.</p>",
+    testCases: [
+      { input: [3, 1, 5, 8], expected: 167 },
+      { input: [1, 5], expected: 10 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Virtual boundary values are 1"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.interval_dp"]
+  },
+  {
+    slug: "matrix-chain-multiplication-cost",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Matrix Chain Multiplication Cost",
+    description: "Values are matrix dimensions p0,p1,...,pn. Matrix i has dimensions p[i-1] x p[i]. Return the minimum scalar multiplication cost.",
+    acceptanceText: "<p><strong>Expected:</strong> Interval DP over chain length and split point.</p>",
+    testCases: [
+      { input: [40, 20, 30, 10, 30], expected: 26000 },
+      { input: [10, 20, 30], expected: 6000 },
+      { input: [10], expected: 0 }
+    ],
+    constraints: ["Need at least two matrices for a non-zero cost"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.interval_dp"]
+  },
+  {
+    slug: "minimum-score-triangulation",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Minimum Score Triangulation",
+    description: "Values are polygon vertex weights in order. Triangulate the polygon and return the minimum possible sum of triangle scores, where score is product of its three vertex weights.",
+    acceptanceText: "<p><strong>Expected:</strong> Interval DP over polygon ranges, trying each middle vertex as the triangle with range endpoints.</p>",
+    testCases: [
+      { input: [1, 2, 3], expected: 6 },
+      { input: [3, 7, 4, 5], expected: 144 },
+      { input: [1, 3, 1, 4, 1, 5], expected: 13 }
+    ],
+    constraints: ["At least 3 vertices needed"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.interval_dp"]
+  },
+  {
+    slug: "egg-drop-two-eggs",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Two Egg Drop Minimum Moves",
+    description: "The first number is floors n. You have exactly two eggs. Return the minimum number of moves needed in the worst case to determine the critical floor.",
+    acceptanceText: "<p><strong>Expected:</strong> DP by moves or triangular-number reasoning: smallest m where m*(m+1)/2 >= n.</p>",
+    testCases: [
+      { input: [2], expected: 2 },
+      { input: [100], expected: 14 },
+      { input: [0], expected: 0 }
+    ],
+    constraints: ["Exactly two eggs"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "paint-house-min-cost",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Uber",
+    companyTags: ["PRODUCT_BASED", "MNC"],
+    heading: "Paint House Minimum Cost",
+    description: "Costs are encoded as triples for each house: red, blue, green. Adjacent houses cannot use the same color. Return the minimum total cost.",
+    acceptanceText: "<p><strong>Expected:</strong> DP per house/color taking min from the other two previous colors.</p>",
+    testCases: [
+      { input: [17, 2, 17, 16, 16, 5, 14, 3, 19], expected: 10 },
+      { input: [7, 6, 2], expected: 2 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Input length should be a multiple of 3"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "delete-and-earn",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Delete And Earn",
+    description: "Choosing a value x earns x points for every occurrence of x and deletes all x-1 and x+1 values. Return maximum points.",
+    acceptanceText: "<p><strong>Expected:</strong> Aggregate points by value, then run house-robber DP over sorted value coordinates.</p>",
+    testCases: [
+      { input: [3, 4, 2], expected: 6 },
+      { input: [2, 2, 3, 3, 3, 4], expected: 9 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Choosing x removes adjacent values by numeric value"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "maximum-length-pair-chain",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximum Length Pair Chain",
+    description: "Values are encoded as start,end pairs. A pair (a,b) can be followed by (c,d) if b < c. Return the longest chain length.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort by end for greedy or sort by start and use LIS-style DP. Discuss both.</p>",
+    testCases: [
+      { input: [1, 2, 2, 3, 3, 4], expected: 2 },
+      { input: [1, 2, 7, 8, 4, 5], expected: 3 },
+      { input: [], expected: 0 }
+    ],
+    constraints: ["Ignore incomplete trailing endpoint"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.greedy"]
+  },
+  {
+    slug: "russian-doll-envelopes-count",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Meta",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Russian Doll Envelopes Count",
+    description: "Values are encoded as width,height pairs. Return the maximum number of envelopes that can be nested with both width and height strictly increasing.",
+    acceptanceText: "<p><strong>Expected:</strong> Sort width ascending and height descending for equal widths, then LIS on heights.</p>",
+    testCases: [
+      { input: [5, 4, 6, 4, 6, 7, 2, 3], expected: 3 },
+      { input: [1, 1, 1, 1, 1, 1], expected: 1 },
+      { input: [2, 3], expected: 1 }
+    ],
+    constraints: ["Strictly increasing width and height"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.binary_search"]
+  },
+  {
+    slug: "maximum-sum-increasing-subsequence",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "TCS",
+    companyTags: ["MNC", "SERVICE_BASED"],
+    heading: "Maximum Sum Increasing Subsequence",
+    description: "Return the maximum possible sum of a strictly increasing subsequence.",
+    acceptanceText: "<p><strong>Expected:</strong> DP where dp[i] is best sum ending at i. This differs from LIS length.</p>",
+    testCases: [
+      { input: [1, 101, 2, 3, 100, 4, 5], expected: 106 },
+      { input: [3, 4, 5, 10], expected: 22 },
+      { input: [10, 5, 4], expected: 10 }
+    ],
+    constraints: ["Subsequence need not be contiguous"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "longest-arithmetic-subsequence",
+    topic: "Dynamic Programming",
+    difficulty: "HARD",
+    company: "Google",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Longest Arithmetic Subsequence",
+    description: "Return the length of the longest subsequence where the difference between consecutive chosen values is constant.",
+    acceptanceText: "<p><strong>Expected:</strong> DP map per index keyed by difference. O(n²) states.</p>",
+    testCases: [
+      { input: [3, 6, 9, 12], expected: 4 },
+      { input: [9, 4, 7, 2, 10], expected: 3 },
+      { input: [20, 1, 15, 3, 10, 5, 8], expected: 4 }
+    ],
+    constraints: ["Subsequence preserves order"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.hashing"]
+  },
+  {
+    slug: "maximum-product-subarray",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Microsoft",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximum Product Subarray",
+    description: "Return the maximum product of a non-empty contiguous subarray.",
+    acceptanceText: "<p><strong>Expected:</strong> Track both max and min product ending at the current index because negatives swap roles.</p>",
+    testCases: [
+      { input: [2, 3, -2, 4], expected: 6 },
+      { input: [-2, 0, -1], expected: 0 },
+      { input: [-2, 3, -4], expected: 24 }
+    ],
+    constraints: ["Subarray is contiguous"],
+    skillKeys: ["dsa.dynamic_programming"]
+  },
+  {
+    slug: "maximal-square-area",
+    topic: "Dynamic Programming",
+    difficulty: "MEDIUM",
+    company: "Amazon",
+    companyTags: ["BIG_TECH", "PRODUCT_BASED"],
+    heading: "Maximal Square Area",
+    description: "The first two numbers are rows and cols. Remaining values are a flattened binary matrix. Return the area of the largest square containing only 1s.",
+    acceptanceText: "<p><strong>Expected:</strong> DP where each 1 cell extends min(top,left,top-left)+1.</p>",
+    testCases: [
+      { input: [4, 5, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0], expected: 4 },
+      { input: [2, 2, 0, 1, 1, 0], expected: 1 },
+      { input: [1, 1, 0], expected: 0 }
+    ],
+    constraints: ["Matrix values are 0 or 1"],
+    skillKeys: ["dsa.dynamic_programming", "dsa.matrix"]
   }
 ];
 
